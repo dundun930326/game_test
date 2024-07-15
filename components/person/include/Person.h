@@ -14,9 +14,9 @@ typedef struct person
 {
     RenderObject *mRenderObject;
     // int attack;
-    int HP;
+    uint8_t HP;
     int state;
-    int oriX;
+    int8_t oriX;
     int oriY;
     int preX;
     int preY;
@@ -25,7 +25,7 @@ typedef struct person
     int speedX;
     int speedY;// jump
     int weapon_type; // 1->pistol 2->shotgun 3->submachine
-    int cd;
+    int cd;// frames
 
     void (*move)(struct person*, int16_t magX);
     void (*jump)(struct person*);
