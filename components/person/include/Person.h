@@ -1,10 +1,12 @@
+
+#ifndef _PERSON_H_
+#define _PERSON_H_
+
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
 #include "../../engine/include/Engine.h"
 
-#ifndef _PERSON_H_
-#define _PERSON_H_
 
 
 

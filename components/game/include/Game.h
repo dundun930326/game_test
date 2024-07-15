@@ -1,10 +1,13 @@
+#ifndef _GAME_H_
+#define _GAME_H_
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../../engine/include/Engine.h"
-#include "../../person/include/Person.h"
-#include "../../bullet/include/Bullet.h"
+#include "Engine.h"
+#include "Person.h"
+#include "Bullet.h"
 
 
 
@@ -37,3 +40,4 @@ void gameUpdate(Game* game_obj);
 void gameRender(Game* game_obj);
 
 
+#endif // _GAME_H_

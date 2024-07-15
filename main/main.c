@@ -6,9 +6,6 @@
 #include "freertos/task.h"
 #include "esp_spiffs.h"
 
-#include "Engine.h"
-#include "Person.h"
-#include "Bullet.h"
 #include "Game.h"
 
 

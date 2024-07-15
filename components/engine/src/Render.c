@@ -250,7 +250,7 @@ RenderResource* renderManagerFindRenderResourceByName(RenderManager* obj, char n
     return NULL;
 }
 
-void renderManagerAddImage(RenderManager* obj, ResourceManager* resourceManager, char name[], uint16_t* image, uint16_t width, uint16_t height)
+void renderManagerAddImage(RenderManager* obj, ResourceManager* resourceManager, char name[], const uint16_t* image, const uint16_t width, const uint16_t height)
 {
     resourceManager->addResource(resourceManager, name, RESOURCE_GRAPHIC);
 

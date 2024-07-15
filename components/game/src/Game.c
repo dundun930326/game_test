@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "Game.h"
-#include "../../files/people.h"
+#include "people.h"
 
 
 void gameNew(Game* game_obj){
@@ -65,7 +65,11 @@ void gameIntit(Game* game_obj){
     //----//
 
 }
-void gameCheckTreasureChest(Game* game_obj);
+
+void gameCheckTreasureChest(Game* game_obj)
+{
+    // unused;
+}
 
 void gameStart(Game* game_obj){
 
@@ -73,7 +77,12 @@ void gameStart(Game* game_obj){
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
 
 }
-void gameReadInput(Game* game_obj);
+
+void gameReadInput(Game* game_obj)
+{
+    // unused
+}
+
 void gameUpdate(Game* game_obj){
 
     // 這兩個function我不確定要包在哪

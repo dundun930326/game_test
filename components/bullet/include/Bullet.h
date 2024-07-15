@@ -1,10 +1,11 @@
+#ifndef _BULLET_H_
+#define _BULLET_H_
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
 
-#ifndef _BULLET_H_
-#define _BULLET_H_
 
 
 #include "../../engine/include/Engine.h"

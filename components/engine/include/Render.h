@@ -192,7 +192,7 @@ void deleteRenderManager(RenderManager*);
 void renderManagerNew(RenderManager*);
 RenderResource* renderManagerFindRenderResourceByID(RenderManager*, uint8_t); 
 RenderResource* renderManagerFindRenderResourceByName(RenderManager*, char[]); 
-void renderManagerAddImage(RenderManager*, ResourceManager*, char[], uint16_t*, uint16_t, uint16_t);
+void renderManagerAddImage(RenderManager*, ResourceManager*, char[], const uint16_t*, const uint16_t, const uint16_t);
 void renderManagerAddImageByFunction(RenderManager*, ResourceManager*, char[], void (RenderResource*, uint16_t*), uint16_t, uint16_t);
 //void renderManagerAddFont(RenderManager*, ResourceManager*, char[]);
 void renderManagerAddObject(RenderManager*, RenderObject*);   

@@ -108,7 +108,7 @@ RenderResource* Engine_Render_findRenderResourceByName(Engine *engine, char name
     return renderManagerFindRenderResourceByName(engine->RenderManager, name);
 }
 
-void Engine_Render_addImage(Engine *engine, char name[], uint16_t* image, uint16_t width, uint16_t height)
+void Engine_Render_addImage(Engine *engine, char name[], const uint16_t* image, const uint16_t width, const uint16_t height)
 {
     renderManagerAddImage(engine->RenderManager, engine->ResourceManager, name, image, width, height);
 }
