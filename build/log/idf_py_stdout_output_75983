@@ -1,0 +1,52 @@
+-- Found Git: /usr/bin/git (found version "2.39.3 (Apple Git-146)") 
+-- The C compiler identification is GNU 13.2.0
+-- The CXX compiler identification is GNU 13.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Building ESP-IDF components for target esp32
+Processing 5 dependencies:
+[1/5] espressif/esp-dsp (1.4.12)
+[2/5] espressif/jsmn (1.1.0)
+[3/5] espressif/led_strip (2.5.4)
+[4/5] espressif/nghttp (1.62.1)
+[5/5] idf (5.2.1)
+-- Project sdkconfig file /Users/dunnnnn/game_test/sdkconfig
+-- Compiler supported targets: xtensa-esp-elf
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of time_t
+-- Check size of time_t - done
+-- Found Python3: /Users/dunnnnn/.espressif/python_env/idf5.2_py3.11_env/bin/python (found version "3.11.2") found components: Interpreter 
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS - Success
+-- App "ENGINE_TEST" version: b04c78d-dirty
+-- Adding linker script /Users/dunnnnn/game_test/build/esp-idf/esp_system/ld/memory.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_system/ld/esp32/sections.ld.in
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom/esp32/ld/esp32.rom.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom/esp32/ld/esp32.rom.api.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom/esp32/ld/esp32.rom.libgcc.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom/esp32/ld/esp32.rom.newlib-data.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom/esp32/ld/esp32.rom.syscalls.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom/esp32/ld/esp32.rom.newlib-funcs.ld
+-- Adding linker script /Users/dunnnnn/esp/v5.2.1/esp-idf/components/soc/esp32/ld/esp32.peripherals.ld
+-- Chip is esp32, /Users/dunnnnn/ADF/esp-adf/components/esp-adf-libs
+-- Current board name is CONFIG_AUDIO_BOARD_CUSTOM
+-- Components: adf_utils app_trace app_update audio_board audio_hal audio_mixer audio_pipeline audio_recorder audio_sal audio_stream battery_service bluetooth_service bootloader bootloader_support bt bullet clouds cmock console coredump_upload_service cxx decode_png display_service driver dueros_service efuse engine esp-adf-libs esp-sr esp-tls esp_actions esp_adc esp_app_format esp_bootloader_format esp_codec_dev esp_coex esp_common esp_dispatcher esp_eth esp_event esp_event_cast esp_gdbstub esp_hid esp_http_client esp_http_server esp_https_ota esp_https_server esp_hw_support esp_lcd esp_local_ctrl esp_mm esp_netif esp_netif_stack esp_partition esp_peripherals esp_phy esp_pm esp_psram esp_ringbuf esp_rom esp_system esp_timer esp_wifi espcoredump espressif__esp-dsp espressif__jsmn espressif__led_strip espressif__nghttp esptool_py fatfs fontx freertos game hal heap http_parser idf_test ieee802154 input_key_service json keyboardlib log lwip main mbedtls mqtt my_board newlib nvs_flash nvs_sec_provider openthread ota_service partition_table perfmon person playlist pngle protobuf-c protocomm pthread sdmmc soc speaker spi_flash spiffs st7789 tcp_transport tone_partition ulp unity usb vfs wear_levelling wifi_provisioning wifi_service wpa_supplicant xtensa
+-- Component paths: /Users/dunnnnn/ADF/esp-adf/components/adf_utils /Users/dunnnnn/esp/v5.2.1/esp-idf/components/app_trace /Users/dunnnnn/esp/v5.2.1/esp-idf/components/app_update /Users/dunnnnn/ADF/esp-adf/components/audio_board /Users/dunnnnn/ADF/esp-adf/components/audio_hal /Users/dunnnnn/ADF/esp-adf/components/audio_mixer /Users/dunnnnn/ADF/esp-adf/components/audio_pipeline /Users/dunnnnn/ADF/esp-adf/components/audio_recorder /Users/dunnnnn/ADF/esp-adf/components/audio_sal /Users/dunnnnn/ADF/esp-adf/components/audio_stream /Users/dunnnnn/ADF/esp-adf/components/battery_service /Users/dunnnnn/ADF/esp-adf/components/bluetooth_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/bootloader /Users/dunnnnn/esp/v5.2.1/esp-idf/components/bootloader_support /Users/dunnnnn/esp/v5.2.1/esp-idf/components/bt /Users/dunnnnn/game_test/components/bullet /Users/dunnnnn/ADF/esp-adf/components/clouds /Users/dunnnnn/esp/v5.2.1/esp-idf/components/cmock /Users/dunnnnn/esp/v5.2.1/esp-idf/components/console /Users/dunnnnn/ADF/esp-adf/components/coredump_upload_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/cxx /Users/dunnnnn/game_test/components/decode_png /Users/dunnnnn/ADF/esp-adf/components/display_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/driver /Users/dunnnnn/ADF/esp-adf/components/dueros_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/efuse /Users/dunnnnn/game_test/components/engine /Users/dunnnnn/ADF/esp-adf/components/esp-adf-libs /Users/dunnnnn/ADF/esp-adf/components/esp-sr /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp-tls /Users/dunnnnn/ADF/esp-adf/components/esp_actions /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_adc /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_app_format /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_bootloader_format /Users/dunnnnn/ADF/esp-adf/components/esp_codec_dev /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_coex /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_common /Users/dunnnnn/ADF/esp-adf/components/esp_dispatcher /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_eth /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_event /Users/dunnnnn/ADF/esp-adf/components/esp_event_cast /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_gdbstub /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_hid /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_http_client /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_http_server /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_https_ota /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_https_server /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_hw_support /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_lcd /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_local_ctrl /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_mm /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_netif /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_netif_stack /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_partition /Users/dunnnnn/ADF/esp-adf/components/esp_peripherals /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_phy /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_pm /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_psram /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_ringbuf /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_rom /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_system /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_timer /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esp_wifi /Users/dunnnnn/esp/v5.2.1/esp-idf/components/espcoredump /Users/dunnnnn/game_test/managed_components/espressif__esp-dsp /Users/dunnnnn/game_test/managed_components/espressif__jsmn /Users/dunnnnn/game_test/managed_components/espressif__led_strip /Users/dunnnnn/game_test/managed_components/espressif__nghttp /Users/dunnnnn/esp/v5.2.1/esp-idf/components/esptool_py /Users/dunnnnn/esp/v5.2.1/esp-idf/components/fatfs /Users/dunnnnn/game_test/components/fontx /Users/dunnnnn/esp/v5.2.1/esp-idf/components/freertos /Users/dunnnnn/game_test/components/game /Users/dunnnnn/esp/v5.2.1/esp-idf/components/hal /Users/dunnnnn/esp/v5.2.1/esp-idf/components/heap /Users/dunnnnn/esp/v5.2.1/esp-idf/components/http_parser /Users/dunnnnn/esp/v5.2.1/esp-idf/components/idf_test /Users/dunnnnn/esp/v5.2.1/esp-idf/components/ieee802154 /Users/dunnnnn/ADF/esp-adf/components/input_key_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/json /Users/dunnnnn/game_test/components/keyboardlib /Users/dunnnnn/esp/v5.2.1/esp-idf/components/log /Users/dunnnnn/esp/v5.2.1/esp-idf/components/lwip /Users/dunnnnn/game_test/main /Users/dunnnnn/esp/v5.2.1/esp-idf/components/mbedtls /Users/dunnnnn/esp/v5.2.1/esp-idf/components/mqtt /Users/dunnnnn/game_test/components/my_board /Users/dunnnnn/esp/v5.2.1/esp-idf/components/newlib /Users/dunnnnn/esp/v5.2.1/esp-idf/components/nvs_flash /Users/dunnnnn/esp/v5.2.1/esp-idf/components/nvs_sec_provider /Users/dunnnnn/esp/v5.2.1/esp-idf/components/openthread /Users/dunnnnn/ADF/esp-adf/components/ota_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/partition_table /Users/dunnnnn/esp/v5.2.1/esp-idf/components/perfmon /Users/dunnnnn/game_test/components/person /Users/dunnnnn/ADF/esp-adf/components/playlist /Users/dunnnnn/game_test/components/pngle /Users/dunnnnn/esp/v5.2.1/esp-idf/components/protobuf-c /Users/dunnnnn/esp/v5.2.1/esp-idf/components/protocomm /Users/dunnnnn/esp/v5.2.1/esp-idf/components/pthread /Users/dunnnnn/esp/v5.2.1/esp-idf/components/sdmmc /Users/dunnnnn/esp/v5.2.1/esp-idf/components/soc /Users/dunnnnn/game_test/components/speaker /Users/dunnnnn/esp/v5.2.1/esp-idf/components/spi_flash /Users/dunnnnn/esp/v5.2.1/esp-idf/components/spiffs /Users/dunnnnn/game_test/components/st7789 /Users/dunnnnn/esp/v5.2.1/esp-idf/components/tcp_transport /Users/dunnnnn/ADF/esp-adf/components/tone_partition /Users/dunnnnn/esp/v5.2.1/esp-idf/components/ulp /Users/dunnnnn/esp/v5.2.1/esp-idf/components/unity /Users/dunnnnn/esp/v5.2.1/esp-idf/components/usb /Users/dunnnnn/esp/v5.2.1/esp-idf/components/vfs /Users/dunnnnn/esp/v5.2.1/esp-idf/components/wear_levelling /Users/dunnnnn/esp/v5.2.1/esp-idf/components/wifi_provisioning /Users/dunnnnn/ADF/esp-adf/components/wifi_service /Users/dunnnnn/esp/v5.2.1/esp-idf/components/wpa_supplicant /Users/dunnnnn/esp/v5.2.1/esp-idf/components/xtensa
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/dunnnnn/game_test/build

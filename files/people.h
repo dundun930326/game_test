@@ -1,4 +1,3 @@
-#include "Engine.h"
 #include <stdint.h>
 #define PEOPLE_WIDTH 50
 #define PEOPLE_HEIGHT 50

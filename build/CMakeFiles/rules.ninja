@@ -1945,6 +1945,25 @@ rule C_STATIC_LIBRARY_LINKER____idf_playlist_
 #############################################
 # Rule for compiling C files.
 
+rule C_COMPILER____idf_fontx_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for linking C static library.
+
+rule C_STATIC_LIBRARY_LINKER____idf_fontx_
+  command = $PRE_LINK && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E rm -f $TARGET_FILE && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ar qc $TARGET_FILE $LINK_FLAGS $in && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ranlib $TARGET_FILE && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E touch $TARGET_FILE && $POST_BUILD
+  description = Linking C static library $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling C files.
+
 rule C_COMPILER____idf_pngle_
   depfile = $DEP_FILE
   deps = gcc
@@ -1975,25 +1994,6 @@ rule C_COMPILER____idf_decode_png_
 # Rule for linking C static library.
 
 rule C_STATIC_LIBRARY_LINKER____idf_decode_png_
-  command = $PRE_LINK && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E rm -f $TARGET_FILE && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ar qc $TARGET_FILE $LINK_FLAGS $in && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ranlib $TARGET_FILE && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E touch $TARGET_FILE && $POST_BUILD
-  description = Linking C static library $TARGET_FILE
-  restat = $RESTAT
-
-
-#############################################
-# Rule for compiling C files.
-
-rule C_COMPILER____idf_fontx_
-  depfile = $DEP_FILE
-  deps = gcc
-  command = /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
-  description = Building C object $out
-
-
-#############################################
-# Rule for linking C static library.
-
-rule C_STATIC_LIBRARY_LINKER____idf_fontx_
   command = $PRE_LINK && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E rm -f $TARGET_FILE && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ar qc $TARGET_FILE $LINK_FLAGS $in && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ranlib $TARGET_FILE && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E touch $TARGET_FILE && $POST_BUILD
   description = Linking C static library $TARGET_FILE
   restat = $RESTAT
@@ -2078,6 +2078,25 @@ rule C_STATIC_LIBRARY_LINKER____idf_speaker_
 #############################################
 # Rule for compiling C files.
 
+rule C_COMPILER____idf_bullet_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for linking C static library.
+
+rule C_STATIC_LIBRARY_LINKER____idf_bullet_
+  command = $PRE_LINK && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E rm -f $TARGET_FILE && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ar qc $TARGET_FILE $LINK_FLAGS $in && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ranlib $TARGET_FILE && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E touch $TARGET_FILE && $POST_BUILD
+  description = Linking C static library $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling C files.
+
 rule C_COMPILER____idf_engine_
   depfile = $DEP_FILE
   deps = gcc
@@ -2095,10 +2114,48 @@ rule C_STATIC_LIBRARY_LINKER____idf_engine_
 
 
 #############################################
+# Rule for compiling C files.
+
+rule C_COMPILER____idf_game_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for linking C static library.
+
+rule C_STATIC_LIBRARY_LINKER____idf_game_
+  command = $PRE_LINK && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E rm -f $TARGET_FILE && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ar qc $TARGET_FILE $LINK_FLAGS $in && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ranlib $TARGET_FILE && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E touch $TARGET_FILE && $POST_BUILD
+  description = Linking C static library $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling C files.
+
+rule C_COMPILER____idf_person_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for linking C static library.
+
+rule C_STATIC_LIBRARY_LINKER____idf_person_
+  command = $PRE_LINK && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E rm -f $TARGET_FILE && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ar qc $TARGET_FILE $LINK_FLAGS $in && /Users/dunnnnn/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin/xtensa-esp32-elf-ranlib $TARGET_FILE && /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake -E touch $TARGET_FILE && $POST_BUILD
+  description = Linking C static library $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake --regenerate-during-build -S/Users/dunnnnn/game_test_copy -B/Users/dunnnnn/game_test_copy/build
+  command = /Users/dunnnnn/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake --regenerate-during-build -S/Users/dunnnnn/game_test -B/Users/dunnnnn/game_test/build
   description = Re-running CMake...
   generator = 1
 

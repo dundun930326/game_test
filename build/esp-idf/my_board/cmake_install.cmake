@@ -1,4 +1,4 @@
-# Install script for directory: /Users/dunnnnn/game_test_copy/components/my_board
+# Install script for directory: /Users/dunnnnn/game_test/components/my_board
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

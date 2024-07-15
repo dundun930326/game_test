@@ -1,4 +1,4 @@
-# Install script for directory: /Users/dunnnnn/game_test_copy/components/engine
+# Install script for directory: /Users/dunnnnn/game_test/components/engine
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

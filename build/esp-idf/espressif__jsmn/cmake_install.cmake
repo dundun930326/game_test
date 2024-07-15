@@ -1,4 +1,4 @@
-# Install script for directory: /Users/dunnnnn/game_test_copy/managed_components/espressif__jsmn
+# Install script for directory: /Users/dunnnnn/game_test/managed_components/espressif__jsmn
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

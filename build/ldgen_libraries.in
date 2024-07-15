@@ -89,11 +89,14 @@ $<TARGET_FILE:__idf_esp_event_cast>
 $<TARGET_FILE:__idf_input_key_service>
 $<TARGET_FILE:__idf_ota_service>
 $<TARGET_FILE:__idf_playlist>
+$<TARGET_FILE:__idf_fontx>
 $<TARGET_FILE:__idf_pngle>
 $<TARGET_FILE:__idf_decode_png>
-$<TARGET_FILE:__idf_fontx>
 $<TARGET_FILE:__idf_st7789>
 $<TARGET_FILE:__idf_keyboardlib>
 $<TARGET_FILE:__idf_my_board>
 $<TARGET_FILE:__idf_speaker>
+$<TARGET_FILE:__idf_bullet>
 $<TARGET_FILE:__idf_engine>
+$<TARGET_FILE:__idf_game>
+$<TARGET_FILE:__idf_person>
