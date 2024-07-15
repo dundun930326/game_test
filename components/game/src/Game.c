@@ -80,16 +80,15 @@ void gameStart(Game* game_obj){
 
 void gameReadInput(Game* game_obj)
 {
-    // unused
+    // 
+    Engine_Detect(game_obj->gEngine);
+
 }
 
 void gameUpdate(Game* game_obj){
 
-    // 這兩個function我不確定要包在哪
-    Engine_Detect(game_obj->gEngine);
     Engine_Audio_handleAudioEvents(game_obj->gEngine);
-    //
-
+    
     game_obj->player1->move((game_obj->player1));
     Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
     if(game_obj->frames%4==1){
