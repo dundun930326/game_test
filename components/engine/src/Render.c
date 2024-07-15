@@ -8,7 +8,6 @@
 #define _RENDER_C_
 
 #include <string.h>
-#include <stdio.h>
 
 #include <math.h>
 #include "../include/Resource.h"
@@ -38,14 +37,14 @@ void renderResourceNew(RenderResource* obj, uint8_t ID, Resource* resource, uint
     return;
 }
 
-void renderResourceSetLoadFunction(RenderResource* obj, void (*function)(struct renderResource*, uint16_t*))
+void renderResourceSetLoadFunction(RenderResource* obj, void (*function)(struct renderResource*, const uint16_t*))
 {
     obj->loadImage = function;
     obj->setUnloadFunction(obj, renderResourceUnloadImageHeapFree);
 }
 
 //Template for loading functions
-void renderResourceLoadImage(RenderResource* obj, uint16_t* image)
+void renderResourceLoadImage(RenderResource* obj, const uint16_t* image)
 {
     obj->mImage = image;
 }

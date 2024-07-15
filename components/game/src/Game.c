@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "Game.h"
 #include "people.h"
+#include "Engine.h"
 
 
 void gameNew(Game* game_obj){
-
     game_obj->frames = 0;
     game_obj->gEngine = newEngine();
     game_obj->init = gameIntit;
@@ -32,6 +33,7 @@ void gameIntit(Game* game_obj){
     if(player1_character_type == 0){
         extern const uint16_t Sasge[6][2500];
         Engine_Render_addImage(game_obj->gEngine, "person1", Sasge[0], 50, 50);
+        Engine_Render_addImage(game_obj->gEngine, "person2", Sasge[1], 50, 50);
     }
     //1->
     //...
@@ -72,10 +74,8 @@ void gameCheckTreasureChest(Game* game_obj)
 }
 
 void gameStart(Game* game_obj){
-
-    newPerson(game_obj->player1, game_obj->gEngine, 1, 190);
+    game_obj->player1 = newPerson(game_obj->gEngine, 1, 190);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
-
 }
 
 void gameReadInput(Game* game_obj)

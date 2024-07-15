@@ -14,8 +14,7 @@
 
 
 //--important variable--//
-
-
+Game game;
 //----//
 
 //--Declare Managers and objects--//
@@ -26,24 +25,16 @@
 
 void app_main(void)
 {   
-    Game game;
     gameNew(&game);
     game.init(&game);
     game.start(&game);
 
     while(1){
-        
         game.readInput(&game);
         game.update(&game);
         game.render(&game);
-
         vTaskDelay((2000/60)/portTICK_PERIOD_MS);
-
     }
-    
-
-
-
 
     // for(int i = 0; i < 1; i++)
     // {
@@ -57,7 +48,7 @@ void app_main(void)
 
     // int16_t frame_count = 0;
 
-    while(0){
+    //while(0){
         // Engine_Detect(gEngine);
         // Engine_Audio_handleAudioEvents(gEngine);
 
@@ -75,7 +66,7 @@ void app_main(void)
         // Engine_Render_update(gEngine);
         // vTaskDelay((2000/60)/portTICK_PERIOD_MS);
         // frame_count ++;
-    }
+    //}
 
     
     // while(1)

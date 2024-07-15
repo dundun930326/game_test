@@ -37,9 +37,7 @@ void personMove(Person* obj);
 void personJump(Person* obj);
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
+Person* newPerson(Engine* engine, int16_t posX, int16_t posY);
 void deletePerson(Person* obj, Engine* engine);
-void newPerson(Person* obj, Engine* engine, int16_t posX, int16_t posY);
-
-
 
 #endif // _PERSON_H_

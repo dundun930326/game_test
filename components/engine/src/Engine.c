@@ -1,6 +1,9 @@
 #include "Engine.h"
 #include "Keyboard.h"
 #include "Joystick.h"
+#include "Resource.h"
+#include "Render.h"
+#include "Audio.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>

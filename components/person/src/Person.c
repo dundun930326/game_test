@@ -60,8 +60,10 @@ void personAttack(Person* obj){
     else
         return;
 }
-void newPerson(Person* obj, Engine* engine, int16_t posX, int16_t posY)
+
+Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
 {
+    Person* obj = calloc(1, sizeof(Person));
     obj->move = personMove;
     obj->attack = personAttack;
     obj->jump = personJump;
@@ -79,6 +81,7 @@ void newPerson(Person* obj, Engine* engine, int16_t posX, int16_t posY)
     obj->preY = posY;
     obj->speedY = 0;
     obj->mRenderObject = Engine_Render_newObject(engine, "person1", posX, posY, 1);
+    return obj;
 }
 
 void deletePerson(Person* obj, Engine* engine)

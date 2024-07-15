@@ -1,7 +1,8 @@
 set(srcs "src/Game.c")
-set(requires st7789 fontx pngle decode_png keyboardlib esp_adc driver my_board speaker engine person bullet files)
+set(requires engine person bullet files)
+set(priv_requires st7789 fontx pngle decode_png keyboardlib esp_adc driver my_board speaker)
 
 idf_component_register(SRCS "${srcs}"
-                       PRIV_REQUIRES driver
                        INCLUDE_DIRS "include"
-                       REQUIRES "${requires}")
+                       REQUIRES "${requires}"
+                       PRIV_REQUIRES "${priv_requires}")
