@@ -5,6 +5,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_spiffs.h"
+#include "esp_heap_caps.h"
 
 #include "Game.h"
 
@@ -27,12 +28,17 @@ void app_main(void)
 {   
     gameNew(&game);
     game.init(&game);
-    game.start(&game);
+    printf("Game init success!!!\n");
+    //game.start(&game);
 
     while(1){
         game.readInput(&game);
+        //printf("Game readInput success!!!\n");
         game.update(&game);
+        //printf("Game update success!!!\n");
         game.render(&game);
+        //printf("Game render success!!!\n");
+        //vTaskDelay(2000/portTICK_PERIOD_MS);
         vTaskDelay((2000/60)/portTICK_PERIOD_MS);
     }
 

@@ -2,47 +2,43 @@
 #include <stdint.h>
 #include "Person.h"
 
-//X, Y 的讀值在-32678至32677間
-//FPS = 15
-// 
-
-
-
-
-
-
-
-void personMove(Person* obj, int speed_x, bool jump, bool downstair)
+void personMove(Person* obj, int16_t magX)
 {
-    int bottomY = obj->posY+50;
-    int speed_y;
-    speed_x = speed_x*120;
-    speed_x /= (FPS*32678);
-    obj->oriX = speed_x;
+    obj->speedX = magX / 3072;
+}
 
-    // right and left border
-    if(obj->posX + (obj->oriX) <= 0 || obj->posX + (obj->oriX) + 50 >= 320){
-        
-
-
-    }else{
-        obj->mRenderObject->setPos(obj->mRenderObject, obj->posX + (obj->oriX), obj->posY + (obj->oriY));
-        obj->posX += (obj->oriX);
-    }
-
-    //on the floor and jump
-    if(obj->oriY==0 && jump){
-        if(obj->posY <= 0){
-
-        }
-    }
-
+void personJump(Person* obj){
+    if(obj->speedY<=0)
+        obj->speedY = 15; // initial speed of a jump
+    else
+        return;
 }
 
 void personUpdate(Person* obj){
     // person damaged
-    
-
+    if(obj->mRenderObject->mPosX + obj->speedX >= 0 && obj->mRenderObject->mPosX + obj->speedX + 50 < 320)
+    {
+        obj->posX = obj->mRenderObject->mPosX + obj->speedX;
+    }
+    if(obj->mRenderObject->mPosY + (-1 * obj->speedY) + 50 >= 240)
+    {
+        obj->posY = 190;
+        obj->speedY = 0;
+    }
+    else if(obj->mRenderObject->mPosY + (-1 * obj->speedY) <= 0)
+    {
+        obj->posY = 0;
+        obj->speedY = 0;
+    }
+    else
+    {
+        obj->posY -= obj->speedY;
+        obj->speedY--;
+    }
+    if(obj->speedY >= -15) obj->speedY--;
+    //printf("PosX: %d, PosY: %d\n", obj->posX, obj->posY);
+    obj->mRenderObject->setPos(obj->mRenderObject, obj->posX, obj->posY);
+    //printf("set finished!\n");
     // person died
     if(obj->HP==0){
         
@@ -91,9 +87,10 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
-    obj->mRenderObject = Engine_Render_newObject(engine, "person1", posX, posY, 1);
-    obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
-
+    obj->preX = posX;
+    obj->preY = posY;
+    obj->speedY = 0;
+    obj->mRenderObject = Engine_Render_newObject(engine, "person1-1", posX, posY, 1);
     return obj;
 }
 

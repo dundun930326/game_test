@@ -12,6 +12,7 @@
 typedef struct person
 {
     RenderObject *mRenderObject;
+<<<<<<< HEAD
     RenderObject *mWeaponObject;
 
     // int attack;
@@ -25,12 +26,35 @@ typedef struct person
     int8_t cd;// frames
 
     void (*move)(struct person*, int16_t, bool, bool);
+=======
+    // int attack;
+    int HP;
+    int state;
+    int oriX;
+    int oriY;
+    int preX;
+    int preY;
+    int posX;
+    int posY;
+    int speedX;
+    int speedY;// jump
+    int weapon_type; // 1->pistol 2->shotgun 3->submachine
+    int cd;
+
+    void (*move)(struct person*, int16_t magX);
+    void (*jump)(struct person*);
+>>>>>>> 52d7500 (design gameflow)
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
 
 
+<<<<<<< HEAD
 void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
+=======
+void personMove(Person* obj, int16_t magX);
+void personJump(Person* obj);
+>>>>>>> 52d7500 (design gameflow)
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
 Person* newPerson(Engine* engine, int16_t posX, int16_t posY);

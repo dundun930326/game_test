@@ -9,18 +9,29 @@
 #include "Person.h"
 #include "Bullet.h"
 
-
-
 typedef struct game
 {
     Person *player1, *player2;
-    Engine* gEngine;
-    Bullet my_bullet[50];// limitation of bullets : 50
-    Bullet enemy_bullet[50];
+    Engine *gEngine;
+    
+    // limitation of bullets : 20
+    Bullet *my_bullet[20];
+    Bullet enemy_bullet[20];
+
+    //0: sasge, 1: musk, 2: english, 3: pie, 4: anya
+    uint8_t player1_character_type;
+    uint8_t player2_character_type;
+
+    //0: pvc, 1: pvp
+    uint8_t mode;
+
+    //0: title screen, 1: select screen, 2: maingame screen, 3: pause screen
+    uint8_t gameState;
     int frames;
 
     RenderObject *background, *ground;
-    RenderObject *block_1, *block_2, *block_3, *block_4, *block_5;
+    RenderObject *previews[5];
+    RenderObject *blocks[5];
 
     void (*init)(struct game*);
     void (*start)(struct game*);
@@ -28,12 +39,15 @@ typedef struct game
     void (*checkTreasureChest)(struct game*);
     void (*update)(struct game*);
     void (*render)(struct game*);
-
 }Game;
+
+//--functions for internal usage only--//
+void gameLoadPerson(Game* game_obj);
+//----//
 
 void gameNew(Game* game_obj);
 void gameCheckTreasureChest(Game* game_obj);
-void gameIntit(Game* game_obj);
+void gameInit(Game* game_obj);
 void gameStart(Game* game_obj);
 void gameReadInput(Game* game_obj);
 void gameUpdate(Game* game_obj);
