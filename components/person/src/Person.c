@@ -77,6 +77,7 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
 {
     Person* obj = calloc(1, sizeof(Person));
     obj->move = personMove;
+    obj->jump = personJump;
     obj->attack = personAttack;
     obj->update = personUpdate;
     obj->state = 1; //1->normal 2->damaged >=3->invincible (decaded by frames)
@@ -87,8 +88,6 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
-    obj->preX = posX;
-    obj->preY = posY;
     obj->mRenderObject = Engine_Render_newObject(engine, "person1-1l", posX, posY, 1);
     //obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
 

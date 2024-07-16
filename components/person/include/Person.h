@@ -21,16 +21,20 @@ typedef struct person
     int16_t oriY;
     int16_t posX;
     int16_t posY;
+    int16_t speedX;
+    int16_t speedY;
     int8_t weapon_type; // 1->pistol 2->shotgun 3->submachine
     int8_t cd;// frames
 
-    void (*move)(struct person*, int16_t, bool, bool);
+    void (*move)(struct person*, int16_t);
+    void (*jump)(struct person*);
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
 
 
-void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
+//void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
+void personMove(Person* obj, int16_t magX);//speed_x -> x data of joystick
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
 Person* newPerson(Engine* engine, int16_t posX, int16_t posY);

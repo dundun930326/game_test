@@ -16,7 +16,7 @@ typedef struct game
     
     // limitation of bullets : 20
     Bullet *my_bullet[20];
-    Bullet enemy_bullet[20];
+    Bullet *enemy_bullet[20];
 
     //0: sasge, 1: musk, 2: english, 3: pie, 4: anya
     uint8_t player1_character_type;
