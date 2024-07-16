@@ -1,13 +1,18 @@
+#ifndef _BULLET_C_
+#define _BULLET_C_
+
 #include "Bullet.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 
+#define PI 3.14159265
+
 //Moves the bullet, and return whether the bullet is alive
 bool bulletMove(Bullet* obj)
 {
-    obj->posX += cos(obj->angle) * obj->speed;
-    obj->posY -= sin(obj->angle) * obj->speed;
+    obj->posX += cos(obj->angle * PI / 180) * obj->speed;
+    obj->posY -= sin(obj->angle * PI / 180) * obj->speed;
     
     if(obj->posX<0 || obj->posY<0 || obj->posX>320 || obj->posY > 240)
     {
@@ -60,3 +65,5 @@ void deleteBullet(Bullet* obj, Engine* engine)
         free(obj);
     }
 }
+
+#endif // _BULLET_C_

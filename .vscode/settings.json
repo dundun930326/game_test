@@ -21,6 +21,10 @@
         "typeinfo": "c",
         "*.def": "c",
         "__tree": "c",
-        "set": "c"
+        "set": "c",
+        "variant": "c",
+        "weapon.h": "c",
+        "stdio.h": "c",
+        "math.h": "c"
     }
 }

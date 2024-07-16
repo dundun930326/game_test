@@ -1,3 +1,6 @@
+#ifndef _GAME_C_
+#define _GAME_C_
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -5,9 +8,9 @@
 #include <string.h>
 #include <math.h>
 #include "Game.h"
+#include "weaponImage.h"
 #include "people.h"
 #include "numbers_bitmap.h"
-#include "weapon.h"
 #include "box.h"
 #include "Engine.h"
 
@@ -39,7 +42,7 @@ const uint16_t bulletImage[] = {0,0,0,0,0,0,0,0,0};
 const char* ind[11] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 const uint16_t (*characters[2][5])[2500] = {{Sasge_left, Musk_left, English_left, Pie_left, Anya_left}, 
                                         {Sasge_right, Musk_right, English_right, Pie_right, Anya_right}};
-char* person_allArray[2][2][6] = {{{"person1-1l", "person1-2l", "person1-3l", "person1-4l", "person1-5l", "person1-6l"}, {"person1-1r", "person1-2r", "person1-3r", "person1-4r", "person1-5r", "person1-6r"}},
+const char* person_allArray[2][2][6] = {{{"person1-1l", "person1-2l", "person1-3l", "person1-4l", "person1-5l", "person1-6l"}, {"person1-1r", "person1-2r", "person1-3r", "person1-4r", "person1-5r", "person1-6r"}},
 {{"person2-1l", "person2-2l", "person2-3l", "person2-4l", "person2-5l", "person2-6l"}, {"person2-1r", "person2-2r", "person2-3r", "person2-4r", "person2-5r", "person2-6r"}}};
 
 //--functions for internal usage only--//
@@ -74,6 +77,7 @@ void gameSelect(Game* game_obj)
 void gameStart(Game* game_obj)
 {
     printf("Game starting...\n");
+    game_obj->frames = 0;
 
     for(int i = 0; i < 5; i++)
     {
@@ -90,13 +94,13 @@ void gameStart(Game* game_obj)
     Engine_Render_addObject(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
 
     //create person objects
-    game_obj->player1 = newPerson(game_obj->gEngine, 0, 190);
+    game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mWeaponObject);
+    //Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mWeaponObject);
 
-    game_obj->player2 = newPerson(game_obj->gEngine, 270, 190);
+    game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mWeaponObject);
+    //Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mWeaponObject);
 
     printf("Game start!\n");
 
@@ -119,6 +123,19 @@ void gameStart(Game* game_obj)
 
 void gameAddNewWeapon(Game* game_obj)
 {
+    srand(game_obj->frames);
+    int possibleLocations[4][2] = {{35, 120}, {235, 120}, {75, 65}, {195, 65}};
+    int type = rand() % 3 + 1;
+    int loc = rand() % 4;
+    for(int i = 0; i < 6; i++)
+    {
+        if(game_obj->weapons[i] == NULL)
+        {
+            game_obj->weapons[i] = newWeapon(game_obj->gEngine, type, possibleLocations[loc][0], possibleLocations[loc][1]);
+            Engine_Render_addObject(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
+            break;
+        }
+    }
     printf("Add a new weapon!!!\n");
 }
 //----//
@@ -142,7 +159,7 @@ void gameNew(Game* game_obj)
 void gameInit(Game* game_obj)
 {
     //--Load Resources--//
-    Engine_Render_addImage(game_obj->gEngine, "treasure", block, 50, 30); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "treasure", box, 50, 50); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
     Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
@@ -175,7 +192,9 @@ void gameInit(Game* game_obj)
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/yamete.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/guncock.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/bipbop.mp3");
+
     Engine_Audio_setVolume(game_obj->gEngine, 0);
+    Engine_Joystick_setThreshold(game_obj->gEngine, 255);
     
     game_obj->background = Engine_Render_newObject(game_obj->gEngine, "background", 0, 0, 1);
     game_obj->ground = Engine_Render_newObject(game_obj->gEngine, "ground", 0, 225, 1);
@@ -266,21 +285,12 @@ void gameReadInput(Game* game_obj)
         case 2:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b001000)
             {
-                printf("Jump!\n");
                 game_obj->player1->jump(game_obj->player1);
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b010000)
             {
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
-                for(int i = 0; i < 20; i++)
-                {
-                    if(game_obj->my_bullet[i] == NULL)
-                    {
-                        game_obj->my_bullet[i] = newBullet(game_obj->gEngine, game_obj->player1, Engine_Joystick_getAngle(game_obj->gEngine));
-                        Engine_Render_addObject(game_obj->gEngine, game_obj->my_bullet[i]->mRenderObject);
-                        break;
-                    }
-                }
+                game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine);
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
@@ -297,7 +307,7 @@ void gameReadInput(Game* game_obj)
             {
                 game_obj->player2->move(game_obj->player2, (game_obj->player1->posX - game_obj->player2->posX) * 100);
 
-                if(game_obj->frames % 60 == 1)
+                if(game_obj->frames % 15 == 1)
                 {
                     for(int i = 0; i < 20; i++)
                     {
@@ -311,7 +321,7 @@ void gameReadInput(Game* game_obj)
                     }
                 }
             }
-            else if(game_obj->mode == 1) // pvp
+            else if(game_obj->mode == 1) // pvp (self-master)
             {
                 //
             }
@@ -347,65 +357,6 @@ void gameUpdate(Game* game_obj)
             break;
         
         case 2:
-            //update person
-            game_obj->player1->update(game_obj->player1);
-            game_obj->player2->update(game_obj->player2);
-            if(game_obj->player1->speedX > 0)
-            {
-                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mWeaponObject, "weapon1-r");
-
-                if(game_obj->frames % 4 == 1)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-2r");
-                }
-                if(game_obj->frames % 4 == 3)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-1r");
-                }
-            }
-            else if(game_obj->player1->speedX < 0)
-            {
-                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mWeaponObject, "weapon1-l");
-
-                if(game_obj->frames % 4 == 1)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-2l");
-                }
-                if(game_obj->frames % 4 == 3)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-1l");
-                }
-            }
-            if(game_obj->player2->speedX > 0)
-            {
-                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mWeaponObject, "weapon1-r");
-
-                if(game_obj->frames % 4 == 1)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-2r");
-                }
-                if(game_obj->frames % 4 == 3)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-1r");
-                }
-            }
-            else if(game_obj->player2->speedX < 0)
-            {
-                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mWeaponObject, "weapon1-l");
-                if(game_obj->frames % 4 == 1)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-2l");
-                }
-                if(game_obj->frames % 4 == 3)
-                {
-                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-1l");
-                }
-            }
-            Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-            Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeaponObject);
-
-            Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
-            
             //update bullet
             for(int i = 0; i < 20; i++)
             {
@@ -413,6 +364,12 @@ void gameUpdate(Game* game_obj)
                 {
                     //printf("find a non-null bullet at (%d, %d)\n", game_obj->my_bullet[i]->posX, game_obj->my_bullet[i]->posY);
                     if(!(game_obj->my_bullet[i]->move(game_obj->my_bullet[i])))
+                    {
+                        Engine_Render_removeObject(game_obj->gEngine, game_obj->my_bullet[i]->mRenderObject);
+                        deleteBullet(game_obj->my_bullet[i], game_obj->gEngine);
+                        game_obj->my_bullet[i] = NULL;
+                    }
+                    else if(game_obj->player2->damage(game_obj->player2, game_obj->my_bullet[i]))
                     {
                         Engine_Render_removeObject(game_obj->gEngine, game_obj->my_bullet[i]->mRenderObject);
                         deleteBullet(game_obj->my_bullet[i], game_obj->gEngine);
@@ -426,8 +383,13 @@ void gameUpdate(Game* game_obj)
                 }
                 if(game_obj->enemy_bullet[i] != NULL)
                 {
-                    //printf("find a non-null bullet at (%d, %d)\n", game_obj->my_bullet[i]->posX, game_obj->my_bullet[i]->posY);
                     if(!(game_obj->enemy_bullet[i]->move(game_obj->enemy_bullet[i])))
+                    {
+                        Engine_Render_removeObject(game_obj->gEngine, game_obj->enemy_bullet[i]->mRenderObject);
+                        deleteBullet(game_obj->enemy_bullet[i], game_obj->gEngine);
+                        game_obj->enemy_bullet[i] = NULL;
+                    }
+                    else if(game_obj->player1->damage(game_obj->player1, game_obj->enemy_bullet[i]))
                     {
                         Engine_Render_removeObject(game_obj->gEngine, game_obj->enemy_bullet[i]->mRenderObject);
                         deleteBullet(game_obj->enemy_bullet[i], game_obj->gEngine);
@@ -441,8 +403,40 @@ void gameUpdate(Game* game_obj)
                 }
             }
 
+            //update person
+            game_obj->player1->update(game_obj->player1, game_obj->gEngine, game_obj->frames);
+            game_obj->player2->update(game_obj->player2, game_obj->gEngine, game_obj->frames);
+            Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
+            if(game_obj->player1->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeapon->mRenderObject);
+            Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
+            if(game_obj->player2->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player2->mWeapon->mRenderObject);
+            
+            //update weapon
+            for(int i = 0; i < 6; i++)
+            {
+                if(game_obj->weapons[i] != NULL)
+                {
+                    if(game_obj->weapons[i]->available)
+                    {
+                        game_obj->weapons[i]->hit(game_obj->weapons[i], game_obj->player1);
+                        game_obj->weapons[i]->hit(game_obj->weapons[i], game_obj->player2);
+                        if(game_obj->weapons[i]->owner == NULL)
+                        {
+                            game_obj->weapons[i]->update(game_obj->weapons[i], game_obj->gEngine);
+                            Engine_Render_render(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
+                        }
+                    }
+                    else
+                    {
+                        Engine_Render_removeObject(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
+                        deleteWeapon(game_obj->weapons[i], game_obj->gEngine);
+                        game_obj->weapons[i] = NULL;
+                    }
+                }
+            }
+
             //update treasure
-            if(game_obj->frames % 300 == 100)
+            if(game_obj->frames % 300 == 0)
             {
                 game_obj->mTreasure->setAvailable(game_obj->mTreasure, 1);
             }
@@ -453,23 +447,30 @@ void gameUpdate(Game* game_obj)
             }
             game_obj->mTreasure->update(game_obj->mTreasure);
             Engine_Render_render(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
-            break;
 
             //update HP text
-            int temp = game_obj->player1->HP;
-            for(int i = 0; i < 3; i++)
+            //printf("now P1: %d, P2: %d\n", game_obj->player1->HP, game_obj->player2->HP);
+            if(game_obj->player1->hurtTime >= 29)
             {
-                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->HP[0][2 - i], ind[temp % 10]);
-                Engine_Render_render(game_obj->gEngine, game_obj->HP[0][2 - i]);
-                temp /= 10;
+                int temp = game_obj->player1->HP;
+                for(int i = 0; i < 3; i++)
+                {
+                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->HP[0][2 - i], ind[temp % 10]);
+                    Engine_Render_render(game_obj->gEngine, game_obj->HP[0][2 - i]);
+                    temp /= 10;
+                }
             }
-            temp = game_obj->player2->HP;
-            for(int i = 0; i < 3; i++)
+            if(game_obj->player2->hurtTime >= 29)
             {
-                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->HP[1][2 - i], ind[temp % 10]);
-                Engine_Render_render(game_obj->gEngine, game_obj->HP[1][2 - i]);
-                temp /= 10;
+                int temp = game_obj->player2->HP;
+                for(int i = 0; i < 3; i++)
+                {
+                    Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->HP[1][2 - i], ind[temp % 10]);
+                    Engine_Render_render(game_obj->gEngine, game_obj->HP[1][2 - i]);
+                    temp /= 10;
+                }
             }
+            break;
     }
     game_obj->frames++;
 }
@@ -477,3 +478,5 @@ void gameUpdate(Game* game_obj)
 void gameRender(Game* game_obj){
     Engine_Render_update(game_obj->gEngine);
 }
+
+#endif // _GAME_C_

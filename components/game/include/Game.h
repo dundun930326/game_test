@@ -9,6 +9,7 @@
 #include "Person.h"
 #include "Bullet.h"
 #include "Treasure.h"
+#include "Weapon.h"
 
 typedef struct game
 {
@@ -19,16 +20,18 @@ typedef struct game
     Bullet *my_bullet[20];
     Bullet *enemy_bullet[20];
 
+    Weapon *weapons[6];
+
     Treasure *mTreasure;
 
     //0: sasge, 1: musk, 2: english, 3: pie, 4: anya
     uint8_t player1_character_type;
     uint8_t player2_character_type;
 
-    //0: pvc, 1: pvp
+    //0: pvc, 1: pvp (self-master), 2: pvp (self-slave)
     uint8_t mode;
 
-    //0: title screen, 1: select screen, 2: maingame screen, 3: pause screen
+    //0: title screen, 1: select screen, 2: maingame screen, 3: pause screen, 4: gameover screen
     uint8_t gameState;
     int frames;
 

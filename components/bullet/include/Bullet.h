@@ -9,6 +9,8 @@
 #include "../../engine/include/Engine.h"
 #include "../../person/include/Person.h"
 
+typedef struct person Person;
+
 typedef struct bullet
 {
     RenderObject *mRenderObject;

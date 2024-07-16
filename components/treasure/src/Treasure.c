@@ -10,6 +10,7 @@
 void treasureSetAvailable(Treasure* obj, bool available)
 {
     obj->available = available;
+    if(obj->available) obj->remainTime = 150;
 }
 
 bool treasureHit(Treasure* obj, Person* person)
@@ -17,7 +18,7 @@ bool treasureHit(Treasure* obj, Person* person)
     if(obj->available)
     {
         if(person->posX + 35 >= obj->posX && person->posX + 15 <= obj->posX + 50
-            && person->posY + 50 >= obj->posY && person->posY <= obj->posY + 30)
+            && person->posY + 50 >= obj->posY + 10 && person->posY <= obj->posY + 40)
         {
             obj->available = 0;
             return true;
@@ -29,6 +30,14 @@ bool treasureHit(Treasure* obj, Person* person)
 
 void treasureUpdate(Treasure* obj)
 {
+    if(obj->remainTime != 0) 
+    {
+        obj->remainTime--;        
+    }
+    else
+    {
+        obj->available = 0;
+    }
     obj->mRenderObject->setVisible(obj->mRenderObject, obj->available);
 }
 
@@ -37,7 +46,7 @@ Treasure* newTreasure(Engine* engine)
     Treasure* obj = calloc(1, sizeof(Treasure));
     obj->available = 0;
     obj->posX = 135;
-    obj->posY = 30;
+    obj->posY = 20;
 
     obj->setAvailable = treasureSetAvailable;
     obj->hit = treasureHit;

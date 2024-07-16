@@ -1,5 +1,5 @@
-#ifndef _WEAPON_H
-#define _WEAPON_H
+#ifndef _WEAPONIMAGE_H_
+#define _WEAPONIMAGE_H_
 
 #include <stdint.h>
 
