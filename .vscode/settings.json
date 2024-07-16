@@ -5,6 +5,16 @@
     "idf.port": "/dev/tty.usbserial-10",
     "files.associations": {
         "bullet.h": "c",
-        "person.h": "c"
+        "person.h": "c",
+        "cstring": "c",
+        "game.h": "c",
+        "complex": "c",
+        "chrono": "c",
+        "__bit_reference": "c",
+        "deque": "c",
+        "future": "c",
+        "ios": "c",
+        "__string": "c",
+        "random": "c"
     }
 }

@@ -6,28 +6,27 @@
 #include <stdint.h>
 #include <math.h>
 
-
-
 #include "../../engine/include/Engine.h"
 #include "../../person/include/Person.h"
 
-
-
-
 typedef struct bullet
 {
-    RenderObject mRenderObject;
+    RenderObject *mRenderObject;
     int speed;
     int angle; //0~360
     int posX;
     int posY;
 
-    void (*new)(struct person*, struct bullet*, int16_t);
+    //void (*new)(struct person*, struct bullet*, int16_t);
     bool (*move)(struct bullet*);
+    void (*update)(struct bullet*);
 }Bullet;
 
 
 bool bulletMove(Bullet* obj);// return whether the bullet is alive
-void bulletNew(Person* person, Bullet* obj, int16_t angle); // create a bullet from the position of a person
+void bulletUpdate(Bullet* obj);
+//void bulletNew(Person* person, Bullet* obj, int16_t angle); // create a bullet from the position of a person
+Bullet* newBullet(Engine* engine, Person* person, int16_t angle);
+void deleteBullet(Bullet* obj, Engine* engine);
 
 #endif // _BULLET_H_

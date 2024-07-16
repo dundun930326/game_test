@@ -22,18 +22,19 @@ typedef struct person
     int preY;
     int posX;
     int posY;
+    int speedX;
     int speedY;// jump
     int weapon_type; // 1->pistol 2->shotgun 3->submachine
     int cd;
 
-    void (*move)(struct person*);
+    void (*move)(struct person*, int16_t magX);
     void (*jump)(struct person*);
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
 
 
-void personMove(Person* obj);
+void personMove(Person* obj, int16_t magX);
 void personJump(Person* obj);
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
