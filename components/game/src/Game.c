@@ -71,9 +71,9 @@ void gameCheckTreasureChest(Game* game_obj)
 {
     // unused;
 }
-//----//
 
-void gameNew(Game* game_obj){
+void gameNew(Game* game_obj)
+{
     game_obj->gameState = 0;
     game_obj->frames = 0;
     game_obj->player1_character_type = 0;
@@ -88,44 +88,12 @@ void gameNew(Game* game_obj){
     game_obj->render = gameRender;
 }
 
-<<<<<<< HEAD
-void gameInit(Game* game_obj){
+void gameInit(Game* game_obj)
+{
     //--Load Resources--//
-=======
-void gameIntit(Game* game_obj){
-    
-    int player1_character_type = 0;
-    int player2_character_type = 0;
-    //--Choose Character--//
-
-
-
-
-
-    //load charactor image
-    //0->sasge
-    if(player1_character_type == 0){
-        extern const uint16_t Anya_left[6][2500];
-        Engine_Render_addImage(game_obj->gEngine, "person1", Anya_left[0], 50, 50);
-        Engine_Render_addImage(game_obj->gEngine, "person2", Anya_left[1], 50, 50);
-    }
-    //1->
-    //...
-
-
-
-
-    //----//
-
-
-    //--Load Resources--//
-    extern const uint16_t weapon_right[3][2500];
-    Engine_Render_addImage(game_obj->gEngine, "weapon1", weapon_left[1], 50, 50);
->>>>>>> b9a4dc4 (the function of person)
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
     Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240);
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
-<<<<<<< HEAD
     Engine_Render_addImage(game_obj->gEngine, "bullet", bulletImage, 3, 3);
     Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview2-1", characters[1][0], 50, 50);
@@ -137,9 +105,7 @@ void gameIntit(Game* game_obj){
     Engine_Render_addImage(game_obj->gEngine, "preview3-2", characters[2][5], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview4-2", characters[3][5], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview5-2", characters[4][5], 50, 50);
-=======
-    Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240);
->>>>>>> b9a4dc4 (the function of person)
+
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/adf_music.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/gunshot.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/metalpipe.mp3");
@@ -151,7 +117,7 @@ void gameIntit(Game* game_obj){
     
     game_obj->background = Engine_Render_newObject(game_obj->gEngine, "background", 0, 0, 1);
     game_obj->ground = Engine_Render_newObject(game_obj->gEngine, "ground", 0, 225, 1);
-<<<<<<< HEAD
+
     game_obj->blocks[0] = Engine_Render_newObject(game_obj->gEngine, "block", 20, 170, 1);
     game_obj->blocks[1] = Engine_Render_newObject(game_obj->gEngine, "block", 220, 170, 1);
     game_obj->blocks[2] = Engine_Render_newObject(game_obj->gEngine, "block", 60, 115, 1);
@@ -172,34 +138,6 @@ void gameIntit(Game* game_obj){
     Engine_Render_addObject(game_obj->gEngine, game_obj->background);
     Engine_Render_addObject(game_obj->gEngine, game_obj->ground);
     //
-=======
-    game_obj->block_1 = Engine_Render_newObject(game_obj->gEngine, "block", 20, 170, 1);
-    game_obj->block_2 = Engine_Render_newObject(game_obj->gEngine, "block", 220, 170, 1);
-    game_obj->block_3 = Engine_Render_newObject(game_obj->gEngine, "block", 60, 115, 1);
-    game_obj->block_4 = Engine_Render_newObject(game_obj->gEngine, "block", 180, 115, 1);
-    game_obj->block_5 = Engine_Render_newObject(game_obj->gEngine, "block", 120, 60, 1);
-    
-    //----//
-
-}
-
-void gameCheckTreasureChest(Game* game_obj)
-{
-    // unused;
-}
-
-void gameStart(Game* game_obj){
-    Engine_Render_addObject(game_obj->gEngine, game_obj->background);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->block_1);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->block_2);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->block_3);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->block_4);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->block_5);
-
-    game_obj->player1 = newPerson(game_obj->gEngine, 1, 190);
-    Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
-    
->>>>>>> b9a4dc4 (the function of person)
 }
 
 void gameReadInput(Game* game_obj)
@@ -303,7 +241,6 @@ void gameReadInput(Game* game_obj)
 void gameUpdate(Game* game_obj)
 {
     Engine_Audio_handleAudioEvents(game_obj->gEngine);
-<<<<<<< HEAD
 
     switch(game_obj->gameState)
     {
@@ -350,21 +287,6 @@ void gameUpdate(Game* game_obj)
             break;
     }
     game_obj->frames++;
-=======
-    
-    // game_obj->player1->move((game_obj->player1),30000,true,false);
-    // Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-    // if(game_obj->frames%4==1){
-    //     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person2");
-    //     Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-    // }
-    // if(game_obj->frames%4==3){
-    //     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1");
-    //     Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-    // }
-
-    game_obj->frames ++;
->>>>>>> b9a4dc4 (the function of person)
 }
 
 void gameRender(Game* game_obj){
