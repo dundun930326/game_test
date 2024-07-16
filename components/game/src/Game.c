@@ -8,6 +8,7 @@
 #include "people.h"
 #include "numbers_bitmap.h"
 #include "weapon.h"
+#include "box.h"
 #include "Engine.h"
 
 #define PI 3.14159265
@@ -23,8 +24,12 @@ extern const uint16_t Musk_right[6][2500];
 extern const uint16_t English_right[6][2500];
 extern const uint16_t Pie_right[6][2500];
 extern const uint16_t Anya_right[6][2500];
+extern const uint16_t weapon1_right[3][2500];
+extern const uint16_t weapon1_left[3][2500];
+
 extern const uint16_t block[];
 extern const uint16_t backgroundImage[];
+extern const uint16_t box[];
 const uint16_t bulletImage[] = {0,0,0,0,0,0,0,0,0};
 
 const char* ind[11] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
@@ -89,8 +94,12 @@ void gameStart(Game* game_obj)
     gameLoadPerson(game_obj);
     game_obj->player1 = newPerson(game_obj->gEngine, 0, 190);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mWeaponObject);
+
     game_obj->player2 = newPerson(game_obj->gEngine, 270, 190);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mWeaponObject);
+
     printf("Game start!\n");
 }
 
@@ -132,6 +141,13 @@ void gameInit(Game* game_obj)
     Engine_Render_addImage(game_obj->gEngine, "preview3-2", characters[0][2][5], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview4-2", characters[0][3][5], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview5-2", characters[0][4][5], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "weapon1-r", weapon_right[0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "weapon2-r", weapon_right[1], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "weapon3-r", weapon_right[2], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "weapon1-l", weapon_left[0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "weapon2-l", weapon_left[1], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "weapon3-l", weapon_left[2], 50, 50);
+
     for(int i = 0; i < 10; i++)
     {
         Engine_Render_addImage(game_obj->gEngine, ind[i], bitmap_allArray[i], 50, 50);
@@ -152,7 +168,7 @@ void gameInit(Game* game_obj)
     game_obj->blocks[1] = Engine_Render_newObject(game_obj->gEngine, "block", 220, 170, 1);
     game_obj->blocks[2] = Engine_Render_newObject(game_obj->gEngine, "block", 60, 115, 1);
     game_obj->blocks[3] = Engine_Render_newObject(game_obj->gEngine, "block", 180, 115, 1);
-    game_obj->blocks[4] = Engine_Render_newObject(game_obj->gEngine, "block", 120, 70, 1);
+    game_obj->blocks[4] = Engine_Render_newObject(game_obj->gEngine, "block", 120, 60, 1);
     for(int i = 1; i < 6; i++)
     {
         char name[11] = "preview";
@@ -314,8 +330,10 @@ void gameUpdate(Game* game_obj)
         case 2:
             game_obj->player1->update(game_obj->player1);
             game_obj->player2->update(game_obj->player2);
-            if(game_obj->player1->speedX >= 0)
+            if(game_obj->player1->speedX > 0)
             {
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mWeaponObject, "weapon1-r");
+
                 if(game_obj->frames % 4 == 1)
                 {
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-2r");
@@ -325,8 +343,10 @@ void gameUpdate(Game* game_obj)
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-1r");
                 }
             }
-            else
+            else if(game_obj->player1->speedX < 0)
             {
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mWeaponObject, "weapon1-l");
+
                 if(game_obj->frames % 4 == 1)
                 {
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-2l");
@@ -336,8 +356,10 @@ void gameUpdate(Game* game_obj)
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1-1l");
                 }
             }
-            if(game_obj->player2->speedX >= 0)
+            if(game_obj->player2->speedX > 0)
             {
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mWeaponObject, "weapon1-r");
+
                 if(game_obj->frames % 4 == 1)
                 {
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-2r");
@@ -347,8 +369,9 @@ void gameUpdate(Game* game_obj)
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-1r");
                 }
             }
-            else
+            else if(game_obj->player2->speedX < 0)
             {
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mWeaponObject, "weapon1-l");
                 if(game_obj->frames % 4 == 1)
                 {
                     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player2->mRenderObject, "person2-2l");
@@ -359,7 +382,11 @@ void gameUpdate(Game* game_obj)
                 }
             }
             Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
+            Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeaponObject);
+
             Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
+            Engine_Render_render(game_obj->gEngine, game_obj->player2->mWeaponObject);
+
             for(int i = 0; i < 20; i++)
             {
                 if(game_obj->my_bullet[i] != NULL)
