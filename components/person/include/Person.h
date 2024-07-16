@@ -7,34 +7,30 @@
 #include <math.h>
 #include "../../engine/include/Engine.h"
 
-
-
+#define FPS 15
 
 typedef struct person
 {
     RenderObject *mRenderObject;
+    RenderObject *mWeaponObject;
+
     // int attack;
     uint8_t HP;
-    int state;
+    uint8_t state;
     int8_t oriX;
-    int oriY;
-    int preX;
-    int preY;
-    int posX;
-    int posY;
-    int speedY;// jump
-    int weapon_type; // 1->pistol 2->shotgun 3->submachine
-    int cd;// frames
+    int16_t oriY;
+    int16_t posX;
+    int16_t posY;
+    int8_t weapon_type; // 1->pistol 2->shotgun 3->submachine
+    int8_t cd;// frames
 
-    void (*move)(struct person*);
-    void (*jump)(struct person*);
+    void (*move)(struct person*, int16_t, int16_t);
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
 
 
-void personMove(Person* obj);
-void personJump(Person* obj);
+void personMove(Person* obj, int speed_x, bool jump);
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
 Person* newPerson(Engine* engine, int16_t posX, int16_t posY);

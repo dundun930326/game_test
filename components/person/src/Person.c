@@ -2,27 +2,41 @@
 #include <stdint.h>
 #include "Person.h"
 
-void personMove(Person* obj)
+//X, Y 的讀值在-32678至32677間
+//FPS = 15
+// 
+
+
+
+
+
+
+
+void personMove(Person* obj, int speed_x, bool jump)
 {
-    if(obj->mRenderObject->mPosX + (5 * obj->oriX) <= 0 || obj->mRenderObject->mPosX + (5 * obj->oriX) + 50 >= 320)
-    {
-        obj->oriX *= -1;
+    int bottomY = obj->posY+50;
+    int speed_y;
+    speed_x = speed_x*120;
+    speed_x /= (FPS*32678);
+    obj->oriX = speed_x;
+
+    // right and left border
+    if(obj->PosX + (obj->oriX) <= 0 || obj->PosX + (obj->oriX) + 50 >= 320){
+        
+
+
+    }else{
+        obj->mRenderObject->setPos(obj->mRenderObject, obj->posX + (obj->oriX), obj->posY + (obj->oriY));
+        obj->posX += (obj->oriX);
     }
 
-    // if(obj->preX + 5*obj->oriX >= 320-50 || obj->preX + 5*obj->oriX <0){
-    //     obj->oriX *= -1;
-    // }
-    
-    obj->mRenderObject->setPos(obj->mRenderObject, obj->mRenderObject->mPosX + (5 * obj->oriX), obj->mRenderObject->mPosY);
-    
+    //on the floor and jump
+    if(obj->oriY==0 && jump){
+        if(obj->posY -  <= 0)
+    }
+
 }
 
-void personJump(Person* obj){
-    if(obj->speedY==0)
-        obj->speedY = 10; // initial speed of a jump
-    else
-        return;
-}
 void personUpdate(Person* obj){
     // person damaged
     
@@ -66,25 +80,25 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     Person* obj = calloc(1, sizeof(Person));
     obj->move = personMove;
     obj->attack = personAttack;
-    obj->jump = personJump;
     obj->update = personUpdate;
-    obj->state = 1;
-    obj->oriX = 1;
-    obj->oriY = 1;
-    // obj->attack = 10;
+    obj->state = 1; //1->normal 2->damaged >=3->invincible (decaded by frames)
+    obj->oriX = 0;
+    obj->oriY = 0; //oriY=0 -> stand on the floor
     obj->HP = 100;
     obj->weapon_type = 1;
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
-    obj->preX = posX;
-    obj->preY = posY;
     obj->speedY = 0;
     obj->mRenderObject = Engine_Render_newObject(engine, "person1", posX, posY, 1);
+    obj->mRenderObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
+
     return obj;
 }
 
 void deletePerson(Person* obj, Engine* engine)
 {
     Engine_Render_deleteObject(engine, obj->mRenderObject);
+    Engine_Render_deleteObject(engine, obj->mWeaponObject);
+
 }
