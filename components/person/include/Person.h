@@ -28,15 +28,23 @@ typedef struct person
     int weapon_type; // 1->pistol 2->shotgun 3->submachine
     int cd;// frames
 
+<<<<<<< HEAD
     void (*move)(struct person*, int16_t magX);
     void (*jump)(struct person*);
+=======
+    void (*move)(struct person*, int16_t, bool, bool);
+>>>>>>> b9a4dc4 (the function of person)
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
 
 
+<<<<<<< HEAD
 void personMove(Person* obj, int16_t magX);
 void personJump(Person* obj);
+=======
+void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
+>>>>>>> b9a4dc4 (the function of person)
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
 Person* newPerson(Engine* engine, int16_t posX, int16_t posY);

@@ -2,10 +2,47 @@
 #include <stdint.h>
 #include "Person.h"
 
+<<<<<<< HEAD
 void personMove(Person* obj, int16_t magX)
 {
     obj->speedX = magX / 3072;
 }
+=======
+//X, Y 的讀值在-32678至32677間
+//FPS = 15
+// 
+
+
+
+
+
+
+
+void personMove(Person* obj, int speed_x, bool jump, bool downstair)
+{
+    int bottomY = obj->posY+50;
+    int speed_y;
+    speed_x = speed_x*120;
+    speed_x /= (FPS*32678);
+    obj->oriX = speed_x;
+
+    // right and left border
+    if(obj->posX + (obj->oriX) <= 0 || obj->posX + (obj->oriX) + 50 >= 320){
+        
+
+
+    }else{
+        obj->mRenderObject->setPos(obj->mRenderObject, obj->posX + (obj->oriX), obj->posY + (obj->oriY));
+        obj->posX += (obj->oriX);
+    }
+
+    //on the floor and jump
+    if(obj->oriY==0 && jump){
+        if(obj->posY <= 0){
+
+        }
+    }
+>>>>>>> b9a4dc4 (the function of person)
 
 void personJump(Person* obj){
     if(obj->speedY<=0)
@@ -87,8 +124,14 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
+<<<<<<< HEAD
     obj->speedY = 0;
     obj->mRenderObject = Engine_Render_newObject(engine, "person1-1", posX, posY, 1);
+=======
+    obj->mRenderObject = Engine_Render_newObject(engine, "person1", posX, posY, 1);
+    obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
+
+>>>>>>> b9a4dc4 (the function of person)
     return obj;
 }
 

@@ -19,7 +19,7 @@
 #define MAX_TEXT_LENGTH 64
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-#define TRANSPARENT 0x0000
+#define TRANSPARENT 0xffff
 
 typedef struct renderManager RenderManager;
 
