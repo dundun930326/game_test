@@ -6,37 +6,14 @@
 //FPS = 15
 // 
 
-
-
-
-
-
-
-void personMove(Person* obj, int speed_x, bool jump, bool downstair)
+void personMove(Person* obj, int16_t magX)
 {
-    int bottomY = obj->posY+50;
-    int speed_y;
-    speed_x = speed_x*120;
-    speed_x /= (FPS*32678);
-    obj->oriX = speed_x;
+    obj->speedX = magX / 3000;
+}
 
-    // right and left border
-    if(obj->posX + (obj->oriX) <= 0 || obj->posX + (obj->oriX) + 50 >= 320){
-        
-
-
-    }else{
-        obj->mRenderObject->setPos(obj->mRenderObject, obj->posX + (obj->oriX), obj->posY + (obj->oriY));
-        obj->posX += (obj->oriX);
-    }
-
-    //on the floor and jump
-    if(obj->oriY==0 && jump){
-        if(obj->posY <= 0){
-
-        }
-    }
-
+void personJump(Person* obj)
+{
+    obj->speedY = 10;
 }
 
 void personUpdate(Person* obj){
@@ -102,6 +79,7 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
 {
     Person* obj = calloc(1, sizeof(Person));
     obj->move = personMove;
+    obj->jump = personJump;
     obj->attack = personAttack;
     obj->update = personUpdate;
     obj->state = 1; //1->normal 2->damaged >=3->invincible (decaded by frames)
@@ -112,8 +90,8 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
-    obj->mRenderObject = Engine_Render_newObject(engine, "person1", posX, posY, 1);
-    obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
+    obj->mRenderObject = Engine_Render_newObject(engine, "person1-1l", posX, posY, 1);
+    //obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
 
     return obj;
 }
@@ -121,6 +99,5 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
 void deletePerson(Person* obj, Engine* engine)
 {
     Engine_Render_deleteObject(engine, obj->mRenderObject);
-    Engine_Render_deleteObject(engine, obj->mWeaponObject);
-
+    //Engine_Render_deleteObject(engine, obj->mWeaponObject);
 }

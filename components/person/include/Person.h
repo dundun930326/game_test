@@ -28,7 +28,6 @@ typedef struct person
 
     void (*move)(struct person*, int16_t magX);
     void (*jump)(struct person*);
-    int cd;
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
