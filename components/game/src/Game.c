@@ -25,44 +25,36 @@ extern const uint16_t Pie_right[6][2500];
 extern const uint16_t Anya_right[6][2500];
 extern const uint16_t block[];
 extern const uint16_t backgroundImage[];
+
+const uint16_t weapon_right[3][2500];
+const uint16_t weapon_left[3][2500];
+
 const uint16_t bulletImage[] = {0,0,0,0,0,0,0,0,0};
 
 const char* ind[11] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 const uint16_t (*characters[2][5])[2500] = {{Sasge_left, Musk_left, English_left, Pie_left, Anya_left}, 
                                         {Sasge_right, Musk_right, English_right, Pie_right, Anya_right}};
+char* person_allArray[2][2][6] = {{{"person1-1l", "person1-2l", "person1-3l", "person1-4l", "person1-5l", "person1-6l"}, {"person1-1r", "person1-2r", "person1-3r", "person1-4r", "person1-5r", "person1-6r"}},
+{{"person2-1l", "person2-2l", "person2-3l", "person2-4l", "person2-5l", "person2-6l"}, {"person2-1r", "person2-2r", "person2-3r", "person2-4r", "person2-5r", "person2-6r"}}};
 
 //--functions for internal usage only--//
 void gameLoadPerson(Game* game_obj)
 {
-    char name[11] = "person1-";
-    for(int i = 1; i < 7; i++)
+    for(int i = 0; i < 6; i++)
     {
-        strcat(name, ind[i]);
-        strcat(name, "l");
-        Engine_Render_addImage(game_obj->gEngine, name, characters[0][game_obj->player1_character_type][i - 1], 50, 50);
-        strcpy(name, "person1-");
+        Engine_Render_addImage(game_obj->gEngine, person_allArray[0][0][i], characters[0][game_obj->player1_character_type][i], 50, 50);
     }
-    for(int i = 1; i < 7; i++)
+    for(int i = 0; i < 6; i++)
     {
-        strcat(name, ind[i]);
-        strcat(name, "r");
-        Engine_Render_addImage(game_obj->gEngine, name, characters[1][game_obj->player1_character_type][i - 1], 50, 50);
-        strcpy(name, "person1-");
+        Engine_Render_addImage(game_obj->gEngine, person_allArray[0][1][i], characters[1][game_obj->player1_character_type][i], 50, 50);
     }
-    strcpy(name, "person2-");
-    for(int i = 1; i < 7; i++)
+    for(int i = 0; i < 6; i++)
     {
-        strcat(name, ind[i]);
-        strcat(name, "l");
-        Engine_Render_addImage(game_obj->gEngine, name, characters[0][game_obj->player2_character_type][i - 1], 50, 50);
-        strcpy(name, "person2-");
+        Engine_Render_addImage(game_obj->gEngine, person_allArray[1][0][i], characters[0][game_obj->player2_character_type][i], 50, 50);
     }
-    for(int i = 1; i < 7; i++)
+    for(int i = 0; i < 6; i++)
     {
-        strcat(name, ind[i]);
-        strcat(name, "r");
-        Engine_Render_addImage(game_obj->gEngine, name, characters[1][game_obj->player2_character_type][i - 1], 50, 50);
-        strcpy(name, "person2-");
+        Engine_Render_addImage(game_obj->gEngine, person_allArray[1][1][i], characters[1][game_obj->player2_character_type][i], 50, 50);
     }
 }
 
@@ -87,17 +79,40 @@ void gameStart(Game* game_obj)
         Engine_Render_addObject(game_obj->gEngine, game_obj->blocks[i]);
     }
     gameLoadPerson(game_obj);
+
+    //create treasure object
+    game_obj->mTreasure = newTreasure(game_obj->gEngine);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
+
+    //create person objects
     game_obj->player1 = newPerson(game_obj->gEngine, 0, 190);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
     game_obj->player2 = newPerson(game_obj->gEngine, 270, 190);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
     printf("Game start!\n");
+
+    //create HP text objects
+    int temp = game_obj->player1->HP;
+    for(int i = 0; i < 3; i++)
+    {
+        game_obj->HP[0][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 15 + 28 * (2 - i), 15, 1);
+        Engine_Render_addObject(game_obj->gEngine, game_obj->HP[0][2 - i]);
+        temp /= 10;
+    }
+    temp = game_obj->player2->HP;
+    for(int i = 0; i < 3; i++)
+    {
+        game_obj->HP[1][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 221 + 28 * (2 - i), 15, 1);
+        Engine_Render_addObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
+        temp /= 10;
+    }
 }
 
-void gameCheckTreasureChest(Game* game_obj)
+void gameAddNewWeapon(Game* game_obj)
 {
-    // unused;
+    printf("Add a new weapon!!!\n");
 }
+//----//
 
 void gameNew(Game* game_obj)
 {
@@ -108,7 +123,7 @@ void gameNew(Game* game_obj)
     game_obj->mode = 0;
     game_obj->gEngine = newEngine();
     game_obj->init = gameInit;
-    game_obj->checkTreasureChest = gameCheckTreasureChest;
+    //game_obj->checkTreasureChest = gameCheckTreasureChest;
     game_obj->start = gameStart;
     game_obj->readInput = gameReadInput;
     game_obj->update = gameUpdate;
@@ -118,8 +133,9 @@ void gameNew(Game* game_obj)
 void gameInit(Game* game_obj)
 {
     //--Load Resources--//
+    Engine_Render_addImage(game_obj->gEngine, "treasure", block, 50, 30); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
-    Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240);
+    Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
     Engine_Render_addImage(game_obj->gEngine, "bullet", bulletImage, 3, 3);
     Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0][0], 50, 50);
@@ -134,7 +150,7 @@ void gameInit(Game* game_obj)
     Engine_Render_addImage(game_obj->gEngine, "preview5-2", characters[0][4][5], 50, 50);
     for(int i = 0; i < 10; i++)
     {
-        Engine_Render_addImage(game_obj->gEngine, ind[i], bitmap_allArray[i], 50, 50);
+        Engine_Render_addImage(game_obj->gEngine, ind[i], bitmap_allArray[i], 28, 40);
     }
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/adf_music.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/gunshot.mp3");
@@ -252,8 +268,11 @@ void gameReadInput(Game* game_obj)
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
-                game_obj->gameState = 3;
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
+                if(game_obj->mode == 0)
+                {
+                    game_obj->gameState = 3;
+                    Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
+                }
             }
             game_obj->player1->move(game_obj->player1, Engine_Joystick_getX(game_obj->gEngine));
             
@@ -312,6 +331,7 @@ void gameUpdate(Game* game_obj)
             break;
         
         case 2:
+            //update person
             game_obj->player1->update(game_obj->player1);
             game_obj->player2->update(game_obj->player2);
             if(game_obj->player1->speedX >= 0)
@@ -360,6 +380,8 @@ void gameUpdate(Game* game_obj)
             }
             Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
             Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
+            
+            //update bullet
             for(int i = 0; i < 20; i++)
             {
                 if(game_obj->my_bullet[i] != NULL)
@@ -393,7 +415,36 @@ void gameUpdate(Game* game_obj)
                     }
                 }
             }
+
+            //update treasure
+            if(game_obj->frames % 300 == 100)
+            {
+                game_obj->mTreasure->setAvailable(game_obj->mTreasure, 1);
+            }
+            else if(game_obj->mTreasure->hit(game_obj->mTreasure, game_obj->player1) || game_obj->mTreasure->hit(game_obj->mTreasure, game_obj->player2))
+            {
+                game_obj->mTreasure->setAvailable(game_obj->mTreasure, 0);
+                gameAddNewWeapon(game_obj);
+            }
+            game_obj->mTreasure->update(game_obj->mTreasure);
+            Engine_Render_render(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
             break;
+
+            //update HP text
+            int temp = game_obj->player1->HP;
+            for(int i = 0; i < 3; i++)
+            {
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->HP[0][2 - i], ind[temp % 10]);
+                Engine_Render_render(game_obj->gEngine, game_obj->HP[0][2 - i]);
+                temp /= 10;
+            }
+            temp = game_obj->player2->HP;
+            for(int i = 0; i < 3; i++)
+            {
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->HP[1][2 - i], ind[temp % 10]);
+                Engine_Render_render(game_obj->gEngine, game_obj->HP[1][2 - i]);
+                temp /= 10;
+            }
     }
     game_obj->frames++;
 }
