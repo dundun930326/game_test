@@ -8,6 +8,7 @@
 #include "Engine.h"
 #include "Person.h"
 #include "Bullet.h"
+#include "Treasure.h"
 
 typedef struct game
 {
@@ -17,6 +18,8 @@ typedef struct game
     // limitation of bullets : 20
     Bullet *my_bullet[20];
     Bullet *enemy_bullet[20];
+
+    Treasure *mTreasure;
 
     //0: sasge, 1: musk, 2: english, 3: pie, 4: anya
     uint8_t player1_character_type;
@@ -32,21 +35,25 @@ typedef struct game
     RenderObject *background, *ground;
     RenderObject *previews[5];
     RenderObject *blocks[5];
+    RenderObject *HP[2][3];
 
     void (*init)(struct game*);
     void (*start)(struct game*);
     void (*readInput)(struct game*);
-    void (*checkTreasureChest)(struct game*);
+    //void (*checkTreasureChest)(struct game*);
     void (*update)(struct game*);
     void (*render)(struct game*);
 }Game;
 
 //--functions for internal usage only--//
 void gameLoadPerson(Game* game_obj);
+void gameSelect(Game* game_obj);
+void gameStart(Game* game_obj);
+void gameAddNewWeapon(Game* game_obj);
 //----//
 
 void gameNew(Game* game_obj);
-void gameCheckTreasureChest(Game* game_obj);
+//void gameCheckTreasureChest(Game* game_obj);
 void gameInit(Game* game_obj);
 void gameStart(Game* game_obj);
 void gameReadInput(Game* game_obj);

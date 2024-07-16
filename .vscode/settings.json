@@ -15,6 +15,12 @@
         "future": "c",
         "ios": "c",
         "__string": "c",
-        "random": "c"
+        "random": "c",
+        "stdbool.h": "c",
+        "stdint.h": "c",
+        "typeinfo": "c",
+        "*.def": "c",
+        "__tree": "c",
+        "set": "c"
     }
 }
