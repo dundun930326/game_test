@@ -7,15 +7,16 @@
 #include <math.h>
 #include "../../engine/include/Engine.h"
 
-
-
+#define FPS 15
 
 typedef struct person
 {
     RenderObject *mRenderObject;
+    RenderObject *mWeaponObject;
+
     // int attack;
     uint8_t HP;
-    int state;
+    uint8_t state;
     int8_t oriX;
     int oriY;
     int preX;

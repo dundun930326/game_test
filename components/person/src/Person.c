@@ -78,19 +78,15 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     Person* obj = calloc(1, sizeof(Person));
     obj->move = personMove;
     obj->attack = personAttack;
-    obj->jump = personJump;
     obj->update = personUpdate;
-    obj->state = 1;
-    obj->oriX = 1;
-    obj->oriY = 1;
-    // obj->attack = 10;
+    obj->state = 1; //1->normal 2->damaged >=3->invincible (decaded by frames)
+    obj->oriX = 0;
+    obj->oriY = 0; //oriY=0 -> stand on the floor
     obj->HP = 100;
     obj->weapon_type = 1;
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
-    obj->preX = posX;
-    obj->preY = posY;
     obj->speedY = 0;
     obj->mRenderObject = Engine_Render_newObject(engine, "person1-1", posX, posY, 1);
     return obj;
@@ -99,4 +95,6 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
 void deletePerson(Person* obj, Engine* engine)
 {
     Engine_Render_deleteObject(engine, obj->mRenderObject);
+    Engine_Render_deleteObject(engine, obj->mWeaponObject);
+
 }
