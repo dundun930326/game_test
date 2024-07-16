@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "Game.h"
 #include "people.h"
+#include "weapon.h"
 #include "Engine.h"
 
 
@@ -31,9 +32,9 @@ void gameIntit(Game* game_obj){
     //load charactor image
     //0->sasge
     if(player1_character_type == 0){
-        extern const uint16_t Sasge[6][2500];
-        Engine_Render_addImage(game_obj->gEngine, "person1", Sasge[0], 50, 50);
-        Engine_Render_addImage(game_obj->gEngine, "person2", Sasge[1], 50, 50);
+        extern const uint16_t Anya_left[6][2500];
+        Engine_Render_addImage(game_obj->gEngine, "person1", Anya_left[0], 50, 50);
+        Engine_Render_addImage(game_obj->gEngine, "person2", Anya_left[1], 50, 50);
     }
     //1->
     //...
@@ -45,9 +46,11 @@ void gameIntit(Game* game_obj){
 
 
     //--Load Resources--//
-
+    extern const uint16_t weapon_right[3][2500];
+    Engine_Render_addImage(game_obj->gEngine, "weapon1", weapon_left[1], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
+    Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240);
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/adf_music.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/gunshot.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/metalpipe.mp3");
@@ -62,7 +65,7 @@ void gameIntit(Game* game_obj){
     game_obj->block_2 = Engine_Render_newObject(game_obj->gEngine, "block", 220, 170, 1);
     game_obj->block_3 = Engine_Render_newObject(game_obj->gEngine, "block", 60, 115, 1);
     game_obj->block_4 = Engine_Render_newObject(game_obj->gEngine, "block", 180, 115, 1);
-    game_obj->block_5 = Engine_Render_newObject(game_obj->gEngine, "block", 120, 70, 1);
+    game_obj->block_5 = Engine_Render_newObject(game_obj->gEngine, "block", 120, 60, 1);
     
     //----//
 
@@ -74,8 +77,16 @@ void gameCheckTreasureChest(Game* game_obj)
 }
 
 void gameStart(Game* game_obj){
+    Engine_Render_addObject(game_obj->gEngine, game_obj->background);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->block_1);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->block_2);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->block_3);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->block_4);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->block_5);
+
     game_obj->player1 = newPerson(game_obj->gEngine, 1, 190);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
+    
 }
 
 void gameReadInput(Game* game_obj)
@@ -89,17 +100,16 @@ void gameUpdate(Game* game_obj){
 
     Engine_Audio_handleAudioEvents(game_obj->gEngine);
     
-    game_obj->player1->move((game_obj->player1));
-    Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-    if(game_obj->frames%4==1){
-        Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person2");
-        Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-    }
-    if(game_obj->frames%4==3){
-        Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1");
-        Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-    }
-
+    // game_obj->player1->move((game_obj->player1),30000,true,false);
+    // Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
+    // if(game_obj->frames%4==1){
+    //     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person2");
+    //     Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
+    // }
+    // if(game_obj->frames%4==3){
+    //     Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->player1->mRenderObject, "person1");
+    //     Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
+    // }
 
     game_obj->frames ++;
 }

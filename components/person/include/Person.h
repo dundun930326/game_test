@@ -24,13 +24,13 @@ typedef struct person
     int8_t weapon_type; // 1->pistol 2->shotgun 3->submachine
     int8_t cd;// frames
 
-    void (*move)(struct person*, int16_t, int16_t);
+    void (*move)(struct person*, int16_t, bool, bool);
     void (*update)(struct person*); //to update the state of a person.(cd--)
     void (*attack)(struct person*);
 }Person;
 
 
-void personMove(Person* obj, int speed_x, bool jump);
+void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
 void personUpdate(Person* obj);
 void personAttack(Person* obj);
 Person* newPerson(Engine* engine, int16_t posX, int16_t posY);

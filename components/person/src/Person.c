@@ -12,7 +12,7 @@
 
 
 
-void personMove(Person* obj, int speed_x, bool jump)
+void personMove(Person* obj, int speed_x, bool jump, bool downstair)
 {
     int bottomY = obj->posY+50;
     int speed_y;
@@ -21,7 +21,7 @@ void personMove(Person* obj, int speed_x, bool jump)
     obj->oriX = speed_x;
 
     // right and left border
-    if(obj->PosX + (obj->oriX) <= 0 || obj->PosX + (obj->oriX) + 50 >= 320){
+    if(obj->posX + (obj->oriX) <= 0 || obj->posX + (obj->oriX) + 50 >= 320){
         
 
 
@@ -32,7 +32,9 @@ void personMove(Person* obj, int speed_x, bool jump)
 
     //on the floor and jump
     if(obj->oriY==0 && jump){
-        if(obj->posY -  <= 0)
+        if(obj->posY <= 0){
+
+        }
     }
 
 }
@@ -89,9 +91,8 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
-    obj->speedY = 0;
     obj->mRenderObject = Engine_Render_newObject(engine, "person1", posX, posY, 1);
-    obj->mRenderObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
+    obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
 
     return obj;
 }
