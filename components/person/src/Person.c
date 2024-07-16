@@ -89,8 +89,9 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY)
     obj->posY = posY;
     obj->preX = posX;
     obj->preY = posY;
-    obj->speedY = 0;
-    obj->mRenderObject = Engine_Render_newObject(engine, "person1-1", posX, posY, 1);
+    obj->mRenderObject = Engine_Render_newObject(engine, "person1-1l", posX, posY, 1);
+    //obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1", posX, posY, 1);
+
     return obj;
 }
 

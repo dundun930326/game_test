@@ -129,6 +129,7 @@ void gameInit(Game* game_obj){
     Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240);
 =======
     Engine_Render_addImage(game_obj->gEngine, "bullet", bulletImage, 3, 3);
+<<<<<<< HEAD
     Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview2-1", characters[1][0], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview3-1", characters[2][0], 50, 50);
@@ -140,6 +141,22 @@ void gameInit(Game* game_obj){
     Engine_Render_addImage(game_obj->gEngine, "preview4-2", characters[3][5], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "preview5-2", characters[4][5], 50, 50);
 >>>>>>> 52d7500 (design gameflow)
+=======
+    Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0][0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview2-1", characters[0][1][0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview3-1", characters[0][2][0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview4-1", characters[0][3][0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview5-1", characters[0][4][0], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview1-2", characters[0][0][5], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview2-2", characters[0][1][5], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview3-2", characters[0][2][5], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview4-2", characters[0][3][5], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "preview5-2", characters[0][4][5], 50, 50);
+    for(int i = 0; i < 10; i++)
+    {
+        Engine_Render_addImage(game_obj->gEngine, ind[i], bitmap_allArray[i], 50, 50);
+    }
+>>>>>>> 6b98f3b (GameState control, bullets, and second person)
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/adf_music.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/gunshot.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/metalpipe.mp3");
