@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+int possibleLocations[4][2] = {{35, 120}, {235, 120}, {75, 65}, {195, 65}};
 const char* weapon_allArray[3][2] =
 {
     {"weapon1-l", "weapon1-r"}, {"weapon2-l", "weapon2-r"}, {"weapon3-l", "weapon3-r"}
@@ -17,12 +18,21 @@ void weaponSetAvailable(Weapon* obj, bool available)
     obj->available = available;
 }
 
+void weaponDrop(Weapon* obj)
+{
+    obj->owner = NULL;
+    obj->intact = 1;
+    obj->intactTime = 10;
+    obj->remainTime = 100;
+}
+
 bool weaponHit(Weapon* obj, Person* person)
 {
     if(obj->owner == NULL)
     {
         if(person->posX + 35 >= obj->posX && person->posX + 15 <= obj->posX + 50
-            && person->posY + 50 >= obj->posY + 10 && person->posY <= obj->posY + 40)
+            && person->posY + 50 >= obj->posY + 10 && person->posY <= obj->posY + 40
+            && obj->intact == 0)
         {
             obj->owner = person;
             obj->owner->releaseWeapon(obj->owner);
@@ -41,6 +51,11 @@ void weaponUpdate(Weapon* obj, Engine* engine)
         if(obj->remainTime != 0)
         {
             obj->remainTime--;
+            if(obj->intactTime != 0)
+            {
+                obj->intactTime--;
+            }
+            else obj->intact = 0;
         }
         else
         {
@@ -56,17 +71,21 @@ void weaponUpdate(Weapon* obj, Engine* engine)
     }
 }
 
-Weapon* newWeapon(Engine* engine, uint8_t weaponType, int16_t posX, int16_t posY)
+Weapon* newWeapon(Engine* engine, uint8_t weaponType, uint8_t loc)
 {
     Weapon* obj = calloc(1, sizeof(Weapon));
+    obj->loc = loc;
     obj->available = 1;
     obj->remainTime = 100;
-    obj->posX = posX;
-    obj->posY = posY;
+    obj->intact = 0;
+    obj->intactTime = 0;
+    obj->posX = possibleLocations[loc][0];
+    obj->posY = possibleLocations[loc][1];
     obj->weaponType = weaponType;
     obj->owner = NULL;
 
     obj->setAvailable = weaponSetAvailable;
+    obj->drop = weaponDrop;
     obj->hit = weaponHit;
     obj->update = weaponUpdate;
 

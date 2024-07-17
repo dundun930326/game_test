@@ -251,12 +251,20 @@ RenderResource* renderManagerFindRenderResourceByName(RenderManager* obj, char n
 
 void renderManagerAddImage(RenderManager* obj, ResourceManager* resourceManager, char name[], const uint16_t* image, const uint16_t width, const uint16_t height)
 {
-    resourceManager->addResource(resourceManager, name, RESOURCE_GRAPHIC);
+    RenderResource* existFile = obj->findRenderResourceByName(obj, name);
+    if(existFile != NULL)
+    {
+        existFile->loadImage(existFile, image);
+    }
+    else
+    {
+        resourceManager->addResource(resourceManager, name, RESOURCE_GRAPHIC);
 
-    renderResourceNew(&obj->mRenderResources[obj->mRenderResourceCount], obj->mRenderResourceCount, resourceManager->findResourceByID(resourceManager, (resourceManager->mResourceCount) - 1), width, height);
-    obj->mRenderResources[obj->mRenderResourceCount].loadImage(&obj->mRenderResources[obj->mRenderResourceCount], image);
+        renderResourceNew(&obj->mRenderResources[obj->mRenderResourceCount], obj->mRenderResourceCount, resourceManager->findResourceByID(resourceManager, (resourceManager->mResourceCount) - 1), width, height);
+        obj->mRenderResources[obj->mRenderResourceCount].loadImage(&obj->mRenderResources[obj->mRenderResourceCount], image);
 
-    obj->mRenderResourceCount++;
+        obj->mRenderResourceCount++;
+    }
     return;
 }
 
@@ -303,8 +311,8 @@ void renderManagerRemoveObject(RenderManager* obj, RenderObject* renderObject)
     renderObject->setVisible(renderObject, 0);
     obj->reRender(obj, renderObject);
     renderObject->setVisible(renderObject, tempVisible);
-    renderObject->prevObj->nextObj = renderObject->nextObj;
-    renderObject->nextObj->prevObj = renderObject->prevObj;
+    if(renderObject->prevObj != NULL) renderObject->prevObj->nextObj = renderObject->nextObj;
+    if(renderObject->nextObj != NULL) renderObject->nextObj->prevObj = renderObject->prevObj;
     renderObject->prevObj = NULL;
     renderObject->nextObj = NULL;
 }

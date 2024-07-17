@@ -10,6 +10,18 @@
 #include "Bullet.h"
 #include "Treasure.h"
 #include "Weapon.h"
+#include "Cpu.h"
+
+enum keyFunc{
+    IDLE1 = 0,
+    IDLE2 = 1,
+    PAUSE = 2,
+    JUMP = 3,
+    ATTACK = 4,
+    ITEM = 5
+};
+
+typedef struct cpu CPU;
 
 typedef struct game
 {
@@ -23,6 +35,8 @@ typedef struct game
     Weapon *weapons[6];
 
     Treasure *mTreasure;
+
+    CPU *mCPU;
 
     //0: sasge, 1: musk, 2: english, 3: pie, 4: anya
     uint8_t player1_character_type;
@@ -39,6 +53,7 @@ typedef struct game
     RenderObject *previews[5];
     RenderObject *blocks[5];
     RenderObject *HP[2][3];
+    RenderObject *result;
 
     void (*init)(struct game*);
     void (*start)(struct game*);

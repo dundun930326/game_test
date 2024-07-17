@@ -21,6 +21,7 @@ bool treasureHit(Treasure* obj, Person* person)
             && person->posY + 50 >= obj->posY + 10 && person->posY <= obj->posY + 40)
         {
             obj->available = 0;
+            person->obtainItem(person);
             return true;
         }
         else return false;

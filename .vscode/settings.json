@@ -2,7 +2,7 @@
     "idf.adapterTargetName": "esp32",
     "idf.portWin": "COM8",
     "idf.flashType": "UART",
-    "idf.port": "/dev/tty.usbserial-1120",
+    "idf.port": "/dev/tty.usbserial-10",
     "files.associations": {
         "bullet.h": "c",
         "person.h": "c",
@@ -25,6 +25,7 @@
         "variant": "c",
         "weapon.h": "c",
         "stdio.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "stdlib.h": "c"
     }
 }

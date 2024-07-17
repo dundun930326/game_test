@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 #include "Person.h"
+
+#define PI 3.14159265
 
 extern const char* person_allArray[2][2][6];
 
@@ -14,7 +17,7 @@ void personMove(Person* obj, int16_t magX)
     {
         obj->oriX *= -1;
     }
-    obj->speedX = magX / 3072;
+    obj->speedX = magX / 3072 + obj->hurtPenalty;
     //if(obj->speedX > 10) obj->speedX = 10;
     //else if(obj->speedX < -10) obj->speedX = -10;
 }
@@ -36,20 +39,24 @@ void personUpdate(Person* obj, Engine* engine, int frames){
     {
         obj->posY = 190;
         obj->speedY = 0;
+        obj->oriY = 1; //stand on the floor
     }
     else if(obj->mRenderObject->mPosY + (-1 * obj->speedY) <= 0)
     {
         obj->posY = 0;
         obj->speedY = 0;
+        obj->oriY = -1; //hit the ceiling
     }
     else if (obj->speedY<=0 && obj->mRenderObject->mPosY + 50 >= 170 && obj->mRenderObject->mPosY + 50 <= 170+15){
         
         if((obj->posX + 25 >= 20 && obj->posX + 25 <= 100)||(obj->posX + 25 >= 20+200 && obj->posX + 25 <= 100+200)){
             obj->posY = 170 - 50;
             obj->speedY = 0;
+            obj->oriY = 1;
         }else{
             obj->posY -= obj->speedY;
-            obj->speedY--;
+            obj->speedY -= obj->accel;
+            obj->oriY = 0;
         }
     }
     else if (obj->speedY<=0 && obj->mRenderObject->mPosY + 50 >= 115 && obj->mRenderObject->mPosY + 50 <= 115+15){
@@ -57,9 +64,11 @@ void personUpdate(Person* obj, Engine* engine, int frames){
         if((obj->posX + 25 >= 60 && obj->posX + 25 <= 140)||(obj->posX + 25 >= 180 && obj->posX + 25 <= 260)){
             obj->posY = 115 - 50;
             obj->speedY = 0;
+            obj->oriY = 1;
         }else{
             obj->posY -= obj->speedY;
-            obj->speedY--;
+            obj->speedY -= obj->accel;
+            obj->oriY = 0;
         }
     }
     else if (obj->speedY<=0 && obj->mRenderObject->mPosY + 50 >= 60 && obj->mRenderObject->mPosY + 50 <= 15+60){
@@ -67,17 +76,22 @@ void personUpdate(Person* obj, Engine* engine, int frames){
         if((obj->posX + 25 >= 120 && obj->posX + 25 <= 200)){
             obj->posY = 60 - 50;
             obj->speedY = 0;
+            obj->oriY = 1;
         }else{
             obj->posY -= obj->speedY;
-            obj->speedY--;
+            obj->speedY -= obj->accel;
+            obj->oriY = 0;
         }
     }
     else
     {
         obj->posY -= obj->speedY;
-        obj->speedY--;
+        obj->speedY -= obj->accel;
+        obj->oriY = 0;
     }
     if(obj->speedY >= -15) obj->speedY--;
+
+    //printf("posX: %d, posY: %d, oriX: %d, oriY: %d\n", obj->posX, obj->posY, obj->oriX, obj->oriY);
     
     if(obj->oriX > 0)
     {
@@ -109,21 +123,32 @@ void personUpdate(Person* obj, Engine* engine, int frames){
         obj->mWeapon->update(obj->mWeapon, engine);
     }
     obj->mRenderObject->setPos(obj->mRenderObject, obj->posX, obj->posY);
-    //obj->mWeaponObject->setPos(obj->mWeaponObject, obj->posX, obj->posY);
+    obj->mItemObject->setPos(obj->mItemObject, obj->posX, obj->posY);
     if(obj->cd != 0) obj->cd--;
+
     if(obj->hurtTime != 0) obj->hurtTime--;
     else
     {
-        obj->state = 1;
+        if(obj->state == 2) obj->state = 1;
     }
-    //printf("set finished!\n");
+    if(obj->hurtPenalty > 0) obj->hurtPenalty--;
+    else if(obj->hurtPenalty < 0) obj->hurtPenalty++;
+
+    if(obj->powerTime != 0) obj->powerTime--;
+    else
+    {
+        if(obj->state == 3) obj->state = 1;
+    }
+    
+    //printf("now power duration to %d\n", obj->powerTime);
+    //printf("now state: %d\n", obj->state);
     // person died
     if(obj->HP==0){
         
     }
 }
 
-void personAttack(Person* obj, Bullet* bullets[], Engine* engine){
+void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
     if(obj->cd == 0){
         switch(obj->weapon_type)
         {
@@ -132,14 +157,7 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine){
                 {
                     if(bullets[i] == NULL)
                     {
-                        if(Engine_Joystick_notZero(engine))
-                        {
-                            bullets[i] = newBullet(engine, obj, Engine_Joystick_getAngle(engine));
-                        }
-                        else
-                        {
-                            bullets[i] = newBullet(engine, obj, (obj->oriX > 0) ? 0 : 180);
-                        }
+                        bullets[i] = newBullet(engine, obj, angle);
                         Engine_Render_addObject(engine, bullets[i]->mRenderObject);
                         break;
                     }
@@ -153,14 +171,7 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine){
                 {
                     if(bullets[i] == NULL)
                     {
-                        if(Engine_Joystick_notZero(engine))
-                        {
-                            bullets[i] = newBullet(engine, obj, Engine_Joystick_getAngle(engine));
-                        }
-                        else
-                        {
-                            bullets[i] = newBullet(engine, obj, (obj->oriX > 0) ? 0 : 180);
-                        }
+                        bullets[i] = newBullet(engine, obj, angle);
                         Engine_Render_addObject(engine, bullets[i]->mRenderObject);
                         break;
                     }
@@ -171,15 +182,6 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine){
             
             case 3://3->submachine
                 int count = 0;
-                double angle;
-                if(Engine_Joystick_notZero(engine))
-                {
-                    angle = Engine_Joystick_getAngle(engine);
-                }
-                else
-                {
-                    angle = (obj->oriX > 0) ? 0 : 180;
-                }
                 for(int i = 0; i < 20; i++)
                 {
                     if(bullets[i] == NULL)
@@ -205,37 +207,38 @@ bool personDamage(Person* obj, Bullet* bullet)
 {
     int cenX = bullet->posX + 1;
     int cenY = bullet->posY + 1;
-    if((obj->posX + 20 <= cenX && cenX <= obj->posX + 30)
-        && (obj->posY + 5 <= cenY && cenY <= obj->posY + 15))
+    if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
+        && (obj->posY <= cenY && cenY <= obj->posY + 50)
+        && obj->state == 1)
     {
-        obj->HP = (obj->HP >= 10) ? (obj->HP - 10) : 0;
         obj->state = 2;
-        obj->hurtTime = 30;
-        return true;
-    }
-    else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
+        obj->hurtTime = HURTTIME_DURATION;
+        obj->hurtPenalty = 15 * cos(bullet->angle * PI / 180);
+        obj->speedY += 15 * sin(bullet->angle * PI / 180);
+        obj->dropWeapon(obj);
+        if((obj->posX + 20 <= cenX && cenX <= obj->posX + 30)
+            && (obj->posY + 5 <= cenY && cenY <= obj->posY + 15))
+        {
+            obj->HP = (obj->HP >= 10) ? (obj->HP - 10) : 0;
+            return true;
+        }
+        else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
             && (obj->posY <= cenY && cenY <= obj->posY + 20))
-    {
-        obj->HP = (obj->HP >= 5) ? (obj->HP - 5) : 0;
-        obj->state = 2;
-        obj->hurtTime = 30;
-        return true;
-    }
-    else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
+        {
+            obj->HP = (obj->HP >= 5) ? (obj->HP - 5) : 0;
+            return true;
+        }
+        else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
             && (obj->posY <= cenY && cenY <= obj->posY + 35))
-    {
-        obj->HP = (obj->HP >= 2) ? (obj->HP - 2) : 0;
-        obj->state = 2;
-        obj->hurtTime = 30;
-        return true;
-    }
-    else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
-        && (obj->posY <= cenY && cenY <= obj->posY + 50))
-    {
-        obj->HP = (obj->HP >= 1) ? (obj->HP - 1) : 0;
-        obj->state = 2;
-        obj->hurtTime = 30;
-        return true;
+        {
+            obj->HP = (obj->HP >= 2) ? (obj->HP - 2) : 0;
+            return true;
+        }
+        else
+        {
+            obj->HP = (obj->HP >= 1) ? (obj->HP - 1) : 0;
+            return true;
+        }
     }
     else return false;
 }
@@ -246,6 +249,7 @@ void personHoldWeapon(Person* obj, Weapon* weapon)
     obj->weapon_type = weapon->weaponType;
 }
 
+//change weapon due to obtaining a new one
 void personReleaseWeapon(Person* obj)
 {
     if(obj->mWeapon != NULL)
@@ -253,6 +257,34 @@ void personReleaseWeapon(Person* obj)
         obj->mWeapon->setAvailable(obj->mWeapon, 0);
         obj->mWeapon = NULL;
         obj->weapon_type = 4;
+    }
+}
+
+//change weapon due to damaged
+void personDropWeapon(Person* obj)
+{
+    if(obj->mWeapon != NULL)
+    {
+        obj->mWeapon->drop(obj->mWeapon);
+        obj->mWeapon = NULL;
+        obj->weapon_type = 4;
+    }
+}
+
+void personObtainItem(Person* obj)
+{
+    obj->item = 1;
+    obj->mItemObject->setVisible(obj->mItemObject, 1);
+}
+
+void personUseItem(Person* obj)
+{
+    if(obj->item == 1)
+    {
+        obj->item = 0;
+        obj->state = 3;
+        obj->powerTime = POWERTIME_DURATION;
+        obj->mItemObject->setVisible(obj->mItemObject, 0);
     }
 }
 
@@ -266,28 +298,37 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index)
     obj->update = personUpdate;
     obj->holdWeapon = personHoldWeapon;
     obj->releaseWeapon = personReleaseWeapon;
-
+    obj->dropWeapon = personDropWeapon;
+    obj->obtainItem = personObtainItem;
+    obj->useItem = personUseItem;
     obj->state = 1; //1->normal 2->damaged >=3->invincible (decaded by frames)
     obj->oriX = (index == 1 ? 1 : -1);
-    obj->oriY = 0; //oriY=0 -> stand on the floor
+    obj->oriY = 1; //oriY=1 -> stand on the floor
     obj->hurtTime = 0;
+    obj->hurtPenalty = 0;
+    obj->powerTime = 0;
+    obj->accel = 1;
     obj->HP = 100;
     obj->index = index;
     obj->weapon_type = 4;
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;
+    obj->item = 0;
     obj->mRenderObject = Engine_Render_newObject(engine, person_allArray[obj->index - 1][1][2 * obj->state - 2], posX, posY, 1);
-    //obj->mWeaponObject = Engine_Render_newObject(engine, "weapon1-l", posX, posY, 1);
+    obj->mItemObject = Engine_Render_newObject(engine, "item", posX, posY, 0);
 
     return obj;
 }
 
 void deletePerson(Person* obj, Engine* engine)
 {
-    Engine_Render_deleteObject(engine, obj->mRenderObject);
-    //Engine_Render_deleteObject(engine, obj->mWeaponObject);
-
+    if(obj != NULL)
+    {
+        Engine_Render_deleteObject(engine, obj->mRenderObject);
+        Engine_Render_deleteObject(engine, obj->mItemObject);
+        free(obj);
+    }
 }
 
 #endif // _PERSON_C_

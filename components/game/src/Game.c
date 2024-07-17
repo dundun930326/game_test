@@ -96,11 +96,11 @@ void gameStart(Game* game_obj)
     //create person objects
     game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
-    //Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mWeaponObject);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mItemObject);
 
     game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
-    //Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mWeaponObject);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mItemObject);
 
     printf("Game start!\n");
 
@@ -119,24 +119,106 @@ void gameStart(Game* game_obj)
         Engine_Render_addObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
         temp /= 10;
     }
+
+    if(game_obj->mode == 0)
+    {
+        game_obj->mCPU = newCPU();
+    }
 }
 
 void gameAddNewWeapon(Game* game_obj)
 {
     srand(game_obj->frames);
-    int possibleLocations[4][2] = {{35, 120}, {235, 120}, {75, 65}, {195, 65}};
     int type = rand() % 3 + 1;
     int loc = rand() % 4;
     for(int i = 0; i < 6; i++)
     {
         if(game_obj->weapons[i] == NULL)
         {
-            game_obj->weapons[i] = newWeapon(game_obj->gEngine, type, possibleLocations[loc][0], possibleLocations[loc][1]);
+            game_obj->weapons[i] = newWeapon(game_obj->gEngine, type, loc);
             Engine_Render_addObject(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
             break;
         }
     }
     printf("Add a new weapon!!!\n");
+}
+
+void gameOver(Game* game_obj, bool result)
+{
+    if(result)
+    {
+        game_obj->result = Engine_Render_newObject(game_obj->gEngine, "win", 0, 0, 1);
+    }
+    else
+    {
+        game_obj->result = Engine_Render_newObject(game_obj->gEngine, "lose", 0, 0, 1);
+    }
+    Engine_Render_addObject(game_obj->gEngine, game_obj->result);
+}
+
+void gameReset(Game* game_obj)
+{
+    for(int i = 0; i < 5; i++)
+    {
+        Engine_Render_removeObject(game_obj->gEngine, game_obj->blocks[i]);
+    }
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->player1->mRenderObject);
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->player1->mItemObject);
+    deletePerson(game_obj->player1, game_obj->gEngine);
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->player2->mRenderObject);
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->player2->mItemObject);
+    deletePerson(game_obj->player2, game_obj->gEngine);
+
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
+    deleteTreasure(game_obj->mTreasure, game_obj->gEngine);
+
+    for(int i = 0; i < 20; i++)
+    {
+        if(game_obj->my_bullet[i] != NULL)
+        {
+            Engine_Render_removeObject(game_obj->gEngine, game_obj->my_bullet[i]->mRenderObject);
+            deleteBullet(game_obj->my_bullet[i], game_obj->gEngine);
+            game_obj->my_bullet[i] = NULL;
+        }
+    }
+    for(int i = 0; i < 20; i++)
+    {
+        if(game_obj->enemy_bullet[i] != NULL)
+        {
+            Engine_Render_removeObject(game_obj->gEngine, game_obj->enemy_bullet[i]->mRenderObject);
+            deleteBullet(game_obj->enemy_bullet[i], game_obj->gEngine);
+            game_obj->enemy_bullet[i] = NULL;
+        }
+    }
+
+    for(int i = 0; i < 6; i++)
+    {
+        if(game_obj->weapons[i] != NULL)
+        {
+            Engine_Render_removeObject(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
+            deleteWeapon(game_obj->weapons[i], game_obj->gEngine);
+            game_obj->weapons[i] = NULL;
+        }
+    }
+
+    for(int i = 0; i < 3; i++)
+    {
+        Engine_Render_removeObject(game_obj->gEngine, game_obj->HP[0][2 - i]);
+        Engine_Render_deleteObject(game_obj->gEngine, game_obj->HP[0][2 - i]);
+    }
+    for(int i = 0; i < 3; i++)
+    {
+        Engine_Render_removeObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
+        Engine_Render_deleteObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
+    }
+
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->result);
+    Engine_Render_deleteObject(game_obj->gEngine, game_obj->result);
+
+    if(game_obj->mode == 0)
+    {
+        deleteCPU(game_obj->mCPU);
+    }
 }
 //----//
 
@@ -159,9 +241,12 @@ void gameNew(Game* game_obj)
 void gameInit(Game* game_obj)
 {
     //--Load Resources--//
-    Engine_Render_addImage(game_obj->gEngine, "treasure", box, 50, 50); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "treasure", box, 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
     Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "win", block, 50, 50); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "lose", block, 50, 50); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "item", block, 50, 50); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
     Engine_Render_addImage(game_obj->gEngine, "bullet", bulletImage, 3, 3);
     Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0][0], 50, 50);
@@ -290,7 +375,18 @@ void gameReadInput(Game* game_obj)
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b010000)
             {
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
-                game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine);
+                if(Engine_Joystick_notZero(game_obj->gEngine))
+                {
+                    game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, Engine_Joystick_getAngle(game_obj->gEngine));
+                }
+                else
+                {
+                    game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, (game_obj->player1->oriX > 0) ? 0 : 180);
+                }
+            }
+            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b100000)
+            {
+                game_obj->player1->useItem(game_obj->player1);
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
@@ -305,21 +401,20 @@ void gameReadInput(Game* game_obj)
             //virtual input section for either computer or connection datas
             if(game_obj->mode == 0) //pvc
             {
-                game_obj->player2->move(game_obj->player2, (game_obj->player1->posX - game_obj->player2->posX) * 100);
-
-                if(game_obj->frames % 15 == 1)
+                game_obj->mCPU->compute(game_obj->mCPU, game_obj);
+                if(game_obj->mCPU->keyboardSim[JUMP] == 1)
                 {
-                    for(int i = 0; i < 20; i++)
-                    {
-                        if(game_obj->enemy_bullet[i] == NULL)
-                        {
-                            Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
-                            game_obj->enemy_bullet[i] = newBullet(game_obj->gEngine, game_obj->player2, 180 * atan2((game_obj->player1->posY - game_obj->player2->posY), (game_obj->player1->posX - game_obj->player2->posX)) / PI);
-                            Engine_Render_addObject(game_obj->gEngine, game_obj->enemy_bullet[i]->mRenderObject);
-                            break;
-                        }
-                    }
+                    game_obj->player2->jump(game_obj->player2);
                 }
+                else if(game_obj->mCPU->keyboardSim[ITEM] == 1)
+                {
+                    game_obj->player2->useItem(game_obj->player2);
+                }
+                else if(game_obj->mCPU->keyboardSim[ATTACK] == 1)
+                {
+                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mCPU->JoystickYSim, game_obj->mCPU->JoystickXSim) * 180 / PI);
+                }
+                game_obj->player2->move(game_obj->player2, game_obj->mCPU->JoystickXSim);
             }
             else if(game_obj->mode == 1) // pvp (self-master)
             {
@@ -332,6 +427,15 @@ void gameReadInput(Game* game_obj)
             {
                 game_obj->gameState = 2;
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
+            }
+            break;
+        
+        case 4:
+            if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
+            {
+                game_obj->gameState = 0;
+                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                gameReset(game_obj);
             }
             break;
     }
@@ -402,14 +506,6 @@ void gameUpdate(Game* game_obj)
                     }
                 }
             }
-
-            //update person
-            game_obj->player1->update(game_obj->player1, game_obj->gEngine, game_obj->frames);
-            game_obj->player2->update(game_obj->player2, game_obj->gEngine, game_obj->frames);
-            Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
-            if(game_obj->player1->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeapon->mRenderObject);
-            Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
-            if(game_obj->player2->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player2->mWeapon->mRenderObject);
             
             //update weapon
             for(int i = 0; i < 6; i++)
@@ -448,9 +544,17 @@ void gameUpdate(Game* game_obj)
             game_obj->mTreasure->update(game_obj->mTreasure);
             Engine_Render_render(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
 
+            //update person
+            game_obj->player1->update(game_obj->player1, game_obj->gEngine, game_obj->frames);
+            game_obj->player2->update(game_obj->player2, game_obj->gEngine, game_obj->frames);
+            Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
+            if(game_obj->player1->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeapon->mRenderObject);
+            Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
+            if(game_obj->player2->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player2->mWeapon->mRenderObject);
+
             //update HP text
             //printf("now P1: %d, P2: %d\n", game_obj->player1->HP, game_obj->player2->HP);
-            if(game_obj->player1->hurtTime >= 29)
+            if(game_obj->player1->hurtTime >= HURTTIME_DURATION - 1)
             {
                 int temp = game_obj->player1->HP;
                 for(int i = 0; i < 3; i++)
@@ -460,7 +564,7 @@ void gameUpdate(Game* game_obj)
                     temp /= 10;
                 }
             }
-            if(game_obj->player2->hurtTime >= 29)
+            if(game_obj->player2->hurtTime >= HURTTIME_DURATION - 1)
             {
                 int temp = game_obj->player2->HP;
                 for(int i = 0; i < 3; i++)
@@ -469,6 +573,24 @@ void gameUpdate(Game* game_obj)
                     Engine_Render_render(game_obj->gEngine, game_obj->HP[1][2 - i]);
                     temp /= 10;
                 }
+            }
+
+            //refresh CPU
+            if(game_obj->mode == 0)
+            {
+                game_obj->mCPU->update(game_obj->mCPU);
+            }
+
+            //detect gameover or not
+            if(game_obj->player1->HP == 0)
+            {
+                gameOver(game_obj, 0);
+                game_obj->gameState = 4;
+            }
+            else if(game_obj->player2->HP == 0)
+            {
+                gameOver(game_obj, 1);
+                game_obj->gameState = 4;
             }
             break;
     }
