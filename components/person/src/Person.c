@@ -83,22 +83,22 @@ void personUpdate(Person* obj, Engine* engine, int frames){
     {
         if(frames % 4 == 1)
         {
-            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][1][2 * obj->state - 2]);
+            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][1][2 * obj->state - 2 + (obj->hurtTime>20)]);
         }
         if(frames % 4 == 3)
         {
-            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][1][2 * obj->state - 1]);
+            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][1][2 * obj->state - 1 + (obj->hurtTime>20)]);
         }
     }
     else
     {
         if(frames % 4 == 1)
         {
-            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][0][2 * obj->state - 2]);
+            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][0][2 * obj->state - 2 + (obj->hurtTime>20)]);
         }
         if(frames % 4 == 3)
         {
-            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][0][2 * obj->state - 1]);
+            Engine_Render_changeObjectImage(engine, obj->mRenderObject, person_allArray[obj->index - 1][0][2 * obj->state - 1 + (obj->hurtTime>20)]);
         }
     }
 
