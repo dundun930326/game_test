@@ -16,7 +16,7 @@ typedef struct game Game;
 
 typedef struct cpu
 {
-    bool keyboardSim[6];
+    int8_t keyboardSim;
     int16_t JoystickXSim;
     int16_t JoystickYSim;
     int16_t CurrentGoal; //block level 0, 1, 2, set -1 for no goal

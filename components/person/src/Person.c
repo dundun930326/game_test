@@ -148,6 +148,19 @@ void personUpdate(Person* obj, Engine* engine, int frames){
     }
 }
 
+void personUpdateData(Person* obj, Engine* engine, ConnectionData* data)
+{
+    obj->HP = data->player_HP;
+    obj->state = data->player_state;
+    obj->oriX = data->player_oriX;
+    obj->oriY = data->player_oriY;
+    obj->posX = data->player_posX;
+    obj->posY = data->player_posY;
+    obj->speedX = data->player_speedX;
+    obj->speedY = data->player_speedY;
+    obj->weapon_type = data->player_weapon_type;
+}
+
 void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
     if(obj->cd == 0){
         switch(obj->weapon_type)
@@ -296,6 +309,7 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index)
     obj->attack = personAttack;
     obj->damage = personDamage;
     obj->update = personUpdate;
+    obj->updateData = personUpdateData;
     obj->holdWeapon = personHoldWeapon;
     obj->releaseWeapon = personReleaseWeapon;
     obj->dropWeapon = personDropWeapon;

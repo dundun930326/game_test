@@ -24,6 +24,7 @@
 extern int goalLocs[6][2] = {{35, 120}, {235, 120}, {75, 65}, {195, 65}, {120, 10}, {120, 190}};
 int16_t blockPosX[3][2] = {{20, 220}, {60, 180}, {120, 120}};
 int16_t blockPosY[3] = {170, 115, 60};
+extern int8_t add[6];
 
 void cpuLookFor(CPU* obj, Game* game)
 {
@@ -63,7 +64,7 @@ void cpuCompute(CPU* obj, Game* game)
             //printf("CPU: now state: 1\n");
             if(game->player2->posY >= blockPosY[2])
             {
-                if(game->frames % 5 == 1) obj->keyboardSim[JUMP] = 1;
+                if(game->frames % 5 == 1) obj->keyboardSim += add[JUMP];
             }
 
             if(game->player2->oriY != 1)
@@ -95,7 +96,7 @@ void cpuCompute(CPU* obj, Game* game)
             //printf("CPU: now state: 2\n");
             if(obj->CurrentGoal == 3 && game->player2->posY >= blockPosY[0]) obj->CurrentGoal = 1;
             else if(obj->CurrentGoal == 2 && game->player2->posY >= blockPosY[0]) obj->CurrentGoal = 0;
-            if(game->frames % 5 == 1) obj->keyboardSim[JUMP] = 1;
+            if(game->frames % 5 == 1) obj->keyboardSim += add[JUMP];
             if(game->player2->oriY != 1)
             {
                 cpuLookFor(obj, game);
@@ -105,13 +106,13 @@ void cpuCompute(CPU* obj, Game* game)
         else if(game->player1->weapon_type != 4 && game->player2->item == 1)
         {
             //printf("CPU: now state: 3\n");
-            if(game->frames % 5 == 2) obj->keyboardSim[ITEM] = 1;
+            if(game->frames % 5 == 2) obj->keyboardSim += add[ITEM];
         }
         //state 4: attack
         else if(game->player2->weapon_type != 4)
         {
             //printf("CPU: now state: 4\n");
-            if(game->frames % 5 == 3) obj->keyboardSim[ATTACK] = 1;
+            if(game->frames % 5 == 3) obj->keyboardSim += add[ATTACK];
             obj->JoystickXSim = game->player1->posX - game->player2->posX;
             obj->JoystickYSim = game->player2->posY - game->player1->posY;
         }
@@ -120,7 +121,7 @@ void cpuCompute(CPU* obj, Game* game)
 
 void cpuUpdate(CPU* obj)
 {
-    for(int i = 0; i < 6; i++) obj->keyboardSim[i] = 0;
+    obj->keyboardSim = 0;
     obj->JoystickXSim = 0;
     obj->JoystickYSim = 0;
 }
@@ -128,7 +129,7 @@ void cpuUpdate(CPU* obj)
 CPU* newCPU()
 {
     CPU* obj = calloc(1, sizeof(CPU));
-    for(int i = 0; i < 6; i++) obj->keyboardSim[i] = 0;
+    obj->keyboardSim = 0;
     obj->JoystickXSim = 0;
     obj->JoystickYSim = 0;
     obj->CurrentGoal = 1;

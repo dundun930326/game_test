@@ -44,6 +44,7 @@ const uint16_t (*characters[2][5])[2500] = {{Sasge_left, Musk_left, English_left
                                         {Sasge_right, Musk_right, English_right, Pie_right, Anya_right}};
 const char* person_allArray[2][2][6] = {{{"person1-1l", "person1-2l", "person1-3l", "person1-4l", "person1-5l", "person1-6l"}, {"person1-1r", "person1-2r", "person1-3r", "person1-4r", "person1-5r", "person1-6r"}},
 {{"person2-1l", "person2-2l", "person2-3l", "person2-4l", "person2-5l", "person2-6l"}, {"person2-1r", "person2-2r", "person2-3r", "person2-4r", "person2-5r", "person2-6r"}}};
+int8_t add[6] = {1, 3, 5, 9, 17, 33};
 
 //--functions for internal usage only--//
 void gameLoadPerson(Game* game_obj)
@@ -68,14 +69,22 @@ void gameLoadPerson(Game* game_obj)
 
 void gameSelect(Game* game_obj)
 {
+    game_obj->gameState = GAMESTATE_SELECT;
+    printf("Now game mode: %d\n", game_obj->mode);
     for(int i = 0; i < 5; i++)
     {
         Engine_Render_addObject(game_obj->gEngine, game_obj->previews[i]);
+    }
+
+    if(game_obj->mode == PVP_MASTER || game_obj->mode == PVP_SLAVE)
+    {
+        gameDataInit(game_obj);
     }
 }
 
 void gameStart(Game* game_obj)
 {
+    game_obj->gameState = GAMESTATE_MAINGAME;
     printf("Game starting...\n");
     game_obj->frames = 0;
 
@@ -94,33 +103,52 @@ void gameStart(Game* game_obj)
     Engine_Render_addObject(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
 
     //create person objects
-    game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1);
+    if(game_obj->mode == PVC || game_obj->mode == PVP_MASTER)
+    {
+        game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1);
+        game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2);
+        int temp = game_obj->player1->HP;
+        for(int i = 0; i < 3; i++)
+        {
+            game_obj->HP[0][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 15 + 28 * (2 - i), 15, 1);
+            Engine_Render_addObject(game_obj->gEngine, game_obj->HP[0][2 - i]);
+            temp /= 10;
+        }
+        temp = game_obj->player2->HP;
+        for(int i = 0; i < 3; i++)
+        {
+            game_obj->HP[1][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 221 + 28 * (2 - i), 15, 1);
+            Engine_Render_addObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
+            temp /= 10;
+        }
+    }
+    else if(game_obj->mode == PVP_SLAVE)
+    {
+        game_obj->player1 = newPerson(game_obj->gEngine, 270, 190, 1);
+        game_obj->player2 = newPerson(game_obj->gEngine, 0, 190, 2);        
+        int temp = game_obj->player1->HP;
+        for(int i = 0; i < 3; i++)
+        {
+            game_obj->HP[0][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 221 + 28 * (2 - i), 15, 1);
+            Engine_Render_addObject(game_obj->gEngine, game_obj->HP[0][2 - i]);
+            temp /= 10;
+        }
+        temp = game_obj->player2->HP;
+        for(int i = 0; i < 3; i++)
+        {
+            game_obj->HP[1][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 15 + 28 * (2 - i), 15, 1);
+            Engine_Render_addObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
+            temp /= 10;
+        }
+    }
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mItemObject);
-
-    game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mItemObject);
 
     printf("Game start!\n");
 
-    //create HP text objects
-    int temp = game_obj->player1->HP;
-    for(int i = 0; i < 3; i++)
-    {
-        game_obj->HP[0][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 15 + 28 * (2 - i), 15, 1);
-        Engine_Render_addObject(game_obj->gEngine, game_obj->HP[0][2 - i]);
-        temp /= 10;
-    }
-    temp = game_obj->player2->HP;
-    for(int i = 0; i < 3; i++)
-    {
-        game_obj->HP[1][2 - i] = Engine_Render_newObject(game_obj->gEngine, ind[temp % 10], 221 + 28 * (2 - i), 15, 1);
-        Engine_Render_addObject(game_obj->gEngine, game_obj->HP[1][2 - i]);
-        temp /= 10;
-    }
-
-    if(game_obj->mode == 0)
+    if(game_obj->mode == PVC)
     {
         game_obj->mCPU = newCPU();
     }
@@ -128,19 +156,21 @@ void gameStart(Game* game_obj)
 
 void gameAddNewWeapon(Game* game_obj)
 {
-    srand(game_obj->frames);
-    int type = rand() % 3 + 1;
-    int loc = rand() % 4;
-    for(int i = 0; i < 6; i++)
+    if(game_obj->mode == PVC || game_obj->mode == PVP_MASTER)
     {
-        if(game_obj->weapons[i] == NULL)
+        srand(game_obj->frames);
+        int type = rand() % 3 + 1;
+        int loc = rand() % 4;
+        for(int i = 0; i < 6; i++)
         {
-            game_obj->weapons[i] = newWeapon(game_obj->gEngine, type, loc);
-            Engine_Render_addObject(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
-            break;
+            if(game_obj->weapons[i] == NULL)
+            {
+                game_obj->weapons[i] = newWeapon(game_obj->gEngine, type, loc);
+                Engine_Render_addObject(game_obj->gEngine, game_obj->weapons[i]->mRenderObject);
+                break;
+            }
         }
     }
-    printf("Add a new weapon!!!\n");
 }
 
 void gameOver(Game* game_obj, bool result)
@@ -158,6 +188,7 @@ void gameOver(Game* game_obj, bool result)
 
 void gameReset(Game* game_obj)
 {
+    game_obj->gameState = GAMESTATE_TITLE;
     for(int i = 0; i < 5; i++)
     {
         Engine_Render_removeObject(game_obj->gEngine, game_obj->blocks[i]);
@@ -215,10 +246,86 @@ void gameReset(Game* game_obj)
     Engine_Render_removeObject(game_obj->gEngine, game_obj->result);
     Engine_Render_deleteObject(game_obj->gEngine, game_obj->result);
 
-    if(game_obj->mode == 0)
+    if(game_obj->mode == PVC)
     {
         deleteCPU(game_obj->mCPU);
     }
+    else
+    {
+        free(game_obj->mDatas);
+        game_obj->mDatas = NULL;
+    }
+}
+//----//
+
+//--Connection related functions--//
+void gameDataInit(Game* game_obj)
+{
+    if(game_obj->mDatas == NULL)
+    {
+        game_obj->mDatas = calloc(1, sizeof(ConnectionData));
+        game_obj->mDatas->game_character_type = 0;
+        game_obj->mDatas->player_HP = 0;
+        game_obj->mDatas->player_state = 0;
+        game_obj->mDatas->player_oriX = 0;
+        game_obj->mDatas->player_oriY = 0;
+        game_obj->mDatas->player_posX = 0;
+        game_obj->mDatas->player_posY = 0;
+        game_obj->mDatas->player_speedX = 0;
+        game_obj->mDatas->player_speedY = 0;
+        game_obj->mDatas->player_weapon_type = 0;
+        game_obj->mDatas->input_keyboard = 0;
+    }
+    if(game_obj->mPackages == NULL)
+    {
+        game_obj->mPackages = calloc(1, sizeof(ConnectionData));
+        game_obj->mPackages->game_character_type = 0;
+        game_obj->mPackages->player_HP = 0;
+        game_obj->mPackages->player_state = 0;
+        game_obj->mPackages->player_oriX = 0;
+        game_obj->mPackages->player_oriY = 0;
+        game_obj->mPackages->player_posX = 0;
+        game_obj->mPackages->player_posY = 0;
+        game_obj->mPackages->player_speedX = 0;
+        game_obj->mPackages->player_speedY = 0;
+        game_obj->mPackages->player_weapon_type = 0;
+        game_obj->mPackages->input_keyboard = 0;
+    }
+}
+
+CPU* temp; //delete this line after pvp mechanic design is done.
+void gameGetData(Game* game_obj)
+{
+    /*
+        TO-DO:
+        1. obtain datas for the other console.
+        2. store them in "game_obj->mDatas".
+    */
+    
+    //--delete these line after pvp mechanic design is done.--//
+    temp->compute(temp, game_obj);
+    game_obj->mDatas->input_joystickX = temp->JoystickXSim;
+    game_obj->mDatas->input_joystickY = temp->JoystickYSim;
+    game_obj->mDatas->input_keyboard = temp->keyboardSim;
+
+    game_obj->mDatas->player_HP = game_obj->player2->HP;
+    game_obj->mDatas->player_state = game_obj->player2->state;
+    game_obj->mDatas->player_oriX = game_obj->player2->oriX;
+    game_obj->mDatas->player_oriY = game_obj->player2->oriY;
+    game_obj->mDatas->player_posX = game_obj->player2->posX;
+    game_obj->mDatas->player_posY = game_obj->player2->posY;
+    game_obj->mDatas->player_speedX = game_obj->player2->speedX;
+    game_obj->mDatas->player_speedY = game_obj->player2->speedY;
+    game_obj->mDatas->player_weapon_type = game_obj->player2->weapon_type;
+    //----//
+}
+
+void gameSendData(Game* game_obj)
+{
+    /*
+        TO-DO:
+        1. send data (i.e. "game_obj->mPackages")
+    */
 }
 //----//
 
@@ -228,7 +335,7 @@ void gameNew(Game* game_obj)
     game_obj->frames = 0;
     game_obj->player1_character_type = 0;
     game_obj->player2_character_type = 0;
-    game_obj->mode = 0;
+    game_obj->mode = PVC;
     game_obj->gEngine = newEngine();
     game_obj->init = gameInit;
     //game_obj->checkTreasureChest = gameCheckTreasureChest;
@@ -240,6 +347,7 @@ void gameNew(Game* game_obj)
 
 void gameInit(Game* game_obj)
 {
+    temp = newCPU(); //delete this line after pvp mechanic design is done.
     //--Load Resources--//
     Engine_Render_addImage(game_obj->gEngine, "treasure", box, 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
@@ -247,6 +355,8 @@ void gameInit(Game* game_obj)
     Engine_Render_addImage(game_obj->gEngine, "win", block, 50, 50); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "lose", block, 50, 50); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "item", block, 50, 50); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "connectionText1", block, 50, 50); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "connectionText2", block, 50, 50); //TODO: change image
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
     Engine_Render_addImage(game_obj->gEngine, "bullet", bulletImage, 3, 3);
     Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0][0], 50, 50);
@@ -289,6 +399,9 @@ void gameInit(Game* game_obj)
     game_obj->blocks[2] = Engine_Render_newObject(game_obj->gEngine, "block", 60, 115, 1);
     game_obj->blocks[3] = Engine_Render_newObject(game_obj->gEngine, "block", 180, 115, 1);
     game_obj->blocks[4] = Engine_Render_newObject(game_obj->gEngine, "block", 120, 60, 1);
+
+    game_obj->connectionText[0] = Engine_Render_newObject(game_obj->gEngine, "connectionText1", 0, 0, 0); //TO-DO: Change Position
+    game_obj->connectionText[1] = Engine_Render_newObject(game_obj->gEngine, "connectionText2", 0, 0, 0); //TO-DO: Change Position
     for(int i = 1; i < 6; i++)
     {
         char name[11] = "preview";
@@ -303,6 +416,8 @@ void gameInit(Game* game_obj)
     //--Add object to the render list for the first time--//
     Engine_Render_addObject(game_obj->gEngine, game_obj->background);
     Engine_Render_addObject(game_obj->gEngine, game_obj->ground);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->connectionText[0]);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->connectionText[1]);
     //
 }
 
@@ -311,29 +426,37 @@ void gameReadInput(Game* game_obj)
     Engine_Detect(game_obj->gEngine);
     switch(game_obj->gameState)
     {
-        case 0:
+        case GAMESTATE_TITLE:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000001)
             {
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
-                game_obj->mode = 0;
+                game_obj->mode = PVC;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000010)
             {
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
-                game_obj->mode = 1;
+                game_obj->mode = PVP_MASTER;
             }  
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
-                if(game_obj->mode == 0)
+                if(game_obj->mode == PVC)
                 {
-                    game_obj->gameState = 1;
                     gameSelect(game_obj);
+                }
+                else if(game_obj->mode == PVP_MASTER)
+                {
+                    gameSelect(game_obj); //delete this line after pvp mechanic design is done.
+                    /*
+                        TO-DO:
+                        1. If no invitation availiable, send one.
+                        2. If there's invitation, accept it.
+                    */
                 }
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
             }
             break;          
         
-        case 1:
+        case GAMESTATE_SELECT:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000001)
             {
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
@@ -361,13 +484,31 @@ void gameReadInput(Game* game_obj)
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
-                game_obj->gameState = 2;
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
-                gameStart(game_obj);
+                if(game_obj->mode == PVC)
+                {
+                    gameStart(game_obj);
+                }
+                else if(game_obj->mode == PVP_MASTER)
+                {
+                    gameStart(game_obj); //delete this line after pvp mechanic design is done.
+                    /*
+                        TO-DO:
+                        1. send game initial message.
+                        2. if the guest is already ready, go "gameStart(game_obj);" directly.
+                    */
+                }
+                else if(game_obj->mode == PVP_SLAVE)
+                {
+                    /*
+                        TO-DO:
+                        1. send ackInit (or something like that) to let the host know that it's ready.
+                    */
+                }
             }
             break;
 
-        case 2:
+        case GAMESTATE_MAINGAME:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b001000)
             {
                 game_obj->player1->jump(game_obj->player1);
@@ -390,7 +531,7 @@ void gameReadInput(Game* game_obj)
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
-                if(game_obj->mode == 0)
+                if(game_obj->mode == PVC)
                 {
                     game_obj->gameState = 3;
                     Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
@@ -399,30 +540,49 @@ void gameReadInput(Game* game_obj)
             game_obj->player1->move(game_obj->player1, Engine_Joystick_getX(game_obj->gEngine));
             
             //virtual input section for either computer or connection datas
-            if(game_obj->mode == 0) //pvc
+            if(game_obj->mode == PVC) //pvc
             {
                 game_obj->mCPU->compute(game_obj->mCPU, game_obj);
-                if(game_obj->mCPU->keyboardSim[JUMP] == 1)
+                if(game_obj->mCPU->keyboardSim == add[JUMP])
                 {
                     game_obj->player2->jump(game_obj->player2);
                 }
-                else if(game_obj->mCPU->keyboardSim[ITEM] == 1)
+                else if(game_obj->mCPU->keyboardSim == add[ITEM])
                 {
                     game_obj->player2->useItem(game_obj->player2);
                 }
-                else if(game_obj->mCPU->keyboardSim[ATTACK] == 1)
+                else if(game_obj->mCPU->keyboardSim == add[ATTACK])
                 {
                     game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mCPU->JoystickYSim, game_obj->mCPU->JoystickXSim) * 180 / PI);
                 }
                 game_obj->player2->move(game_obj->player2, game_obj->mCPU->JoystickXSim);
             }
-            else if(game_obj->mode == 1) // pvp (self-master)
+            else if(game_obj->mode == PVP_MASTER || game_obj->mode == PVP_SLAVE)
             {
-                //
+                gameGetData(game_obj);
+                game_obj->player2->updateData(game_obj->player2, game_obj->gEngine, game_obj->mDatas, game_obj->frames);
+                if(game_obj->mDatas->input_keyboard == add[JUMP])
+                {
+                    game_obj->player2->jump(game_obj->player2);
+                }
+                else if(game_obj->mDatas->input_keyboard == add[ITEM])
+                {
+                    game_obj->player2->useItem(game_obj->player2);
+                }
+                else if(game_obj->mDatas->input_keyboard == add[ATTACK])
+                {
+                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mDatas->input_joystickY, game_obj->mDatas->input_joystickX) * 180 / PI);
+                }
+                game_obj->player2->move(game_obj->player2, game_obj->mDatas->input_joystickX);
+                
+                //pack data
+                game_obj->mPackages->input_keyboard = Engine_Keyboard_getKeyPress(game_obj->gEngine);
+                game_obj->mPackages->input_joystickX = Engine_Joystick_getX(game_obj->gEngine);
+                game_obj->mPackages->input_joystickY = Engine_Joystick_getY(game_obj->gEngine);
             }
             break;
 
-        case 3:
+        case GAMESTATE_PAUSE:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
                 game_obj->gameState = 2;
@@ -430,10 +590,9 @@ void gameReadInput(Game* game_obj)
             }
             break;
         
-        case 4:
+        case GAMESTATE_GAMEOVER:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
-                game_obj->gameState = 0;
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 gameReset(game_obj);
             }
@@ -447,7 +606,17 @@ void gameUpdate(Game* game_obj)
 
     switch(game_obj->gameState)
     {
-        case 1:
+        case GAMESTATE_TITLE:
+            /*
+                TO-DO:
+                1. handle the situation of the pvp invitation.
+                2. If I'm the host, set "game_obj->mode = PVP_MASTER;".
+                3. If I'm the guest, set "game_obj->mode = PVP_SLAVE;".
+                4. If connected, set "gameSelect(game_obj);" to go to character select screen".
+            */
+            break;
+        
+        case GAMESTATE_SELECT:
             for(int i = 1; i < 6; i++)
             {
                 char name[11] = "preview";
@@ -458,9 +627,24 @@ void gameUpdate(Game* game_obj)
                 Engine_Render_render(game_obj->gEngine, game_obj->previews[i - 1]);
                 strcpy(name, "preview");
             }
+
+            if(game_obj->mode == PVP_MASTER)
+            {
+                /*
+                    TO-DO:
+                    1. If the guest is ready, go "gameStart(game_obj);"
+                */
+            }
+            else if(game_obj->mode == PVP_SLAVE)
+            {
+                /*
+                    TO-DO:
+                    1. let the host know that it's ready.
+                */
+            }
             break;
         
-        case 2:
+        case GAMESTATE_MAINGAME:
             //update bullet
             for(int i = 0; i < 20; i++)
             {
@@ -576,9 +760,22 @@ void gameUpdate(Game* game_obj)
             }
 
             //refresh CPU
-            if(game_obj->mode == 0)
+            if(game_obj->mode == PVC)
             {
                 game_obj->mCPU->update(game_obj->mCPU);
+            }
+            else if(game_obj->mode == PVP_MASTER || game_obj->mode == PVP_SLAVE)
+            {
+                game_obj->mPackages->player_HP = game_obj->player1->HP;
+                game_obj->mPackages->player_state = game_obj->player1->state;
+                game_obj->mPackages->player_oriX = game_obj->player1->oriX;
+                game_obj->mPackages->player_oriY = game_obj->player1->oriY;
+                game_obj->mPackages->player_posX = game_obj->player1->posX;
+                game_obj->mPackages->player_posY = game_obj->player1->posY;
+                game_obj->mPackages->player_speedX = game_obj->player1->speedX;
+                game_obj->mPackages->player_speedY = game_obj->player1->speedY;
+                game_obj->mPackages->player_weapon_type = game_obj->player1->weapon_type;
+                gameSendData(game_obj);
             }
 
             //detect gameover or not

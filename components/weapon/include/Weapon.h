@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "../../engine/include/Engine.h"
-#include "../../person/include/Person.h"
+#include "Engine.h"
+#include "Person.h"
 
 typedef struct person Person;
 

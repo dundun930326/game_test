@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "../../weapon/include/Weapon.h"
-#include "../../engine/include/Engine.h"
-#include "../../bullet/include/Bullet.h"
+#include "Weapon.h"
+#include "Engine.h"
+#include "Bullet.h"
+#include "Game.h"
 
 #define FPS 15
 #define POWERTIME_DURATION 100
@@ -14,6 +15,7 @@
 
 typedef struct weapon Weapon;
 typedef struct bullet Bullet;
+typedef struct connectionData ConnectionData;
 
 typedef struct person
 {
@@ -22,7 +24,7 @@ typedef struct person
     //RenderObject *mWeaponObject;
     Weapon *mWeapon;
 
-    //No. of the person
+    //No. of the person (1: master, 2: slave)
     uint8_t index;
 
     // int attack;
@@ -46,6 +48,7 @@ typedef struct person
     void (*move)(struct person*, int16_t);
     void (*jump)(struct person*);
     void (*update)(struct person*, Engine*, int); //to update the state of a person.(cd--)
+    void (*updateData)(struct person*, Engine*, ConnectionData*, int);
     void (*attack)(struct person*, Bullet*[], Engine*, double angle);
     bool (*damage)(struct person*, Bullet*);
     void (*holdWeapon)(struct person*, Weapon*);
@@ -59,6 +62,7 @@ typedef struct person
 //void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
 void personMove(Person* obj, int16_t magX);//speed_x -> x data of joystick
 void personUpdate(Person* obj, Engine* engine, int frames);
+void personUpdateByData(Person* obj, Engine* engine, ConnectionData* data, int frames);
 void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle);
 bool personDamage(Person* obj, Bullet* bullet);
 void personHoldWeapon(Person* obj, Weapon* weapon);
