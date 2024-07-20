@@ -99,12 +99,12 @@ bool Joystick_notZero(Joystick* joystick)
 
 int16_t Joystick_getX(Joystick* joystick)
 {
-    return joystick->x;
+    return joystick->y;
 }
 
 int16_t Joystick_getY(Joystick* joystick)
 {
-    return joystick->y;
+    return (joystick->x == -32768) ? 32767 : -1 * joystick->x;
 }
 
 bool Joystick_getButton(Joystick* joystick)
@@ -114,7 +114,7 @@ bool Joystick_getButton(Joystick* joystick)
 
 double Joystick_getAngle(Joystick* joystick)
 {
-    return atan2(joystick->y, joystick->x) * 180 / 3.1415926;
+    return atan2((joystick->x == -32768) ? 32767 : -1 * joystick->x, joystick->y) * 180 / 3.1415926;
 }
 
 double Joystick_getMagnitude(Joystick* joystick)

@@ -69,6 +69,8 @@ void gameLoadPerson(Game* game_obj)
 
 void gameSelect(Game* game_obj)
 {
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->title);
+    
     game_obj->gameState = GAMESTATE_SELECT;
     printf("Now game mode: %d\n", game_obj->mode);
     for(int i = 0; i < 5; i++)
@@ -255,6 +257,8 @@ void gameReset(Game* game_obj)
         free(game_obj->mDatas);
         game_obj->mDatas = NULL;
     }
+
+    Engine_Render_addObject(game_obj->gEngine, game_obj->title);
 }
 //----//
 
@@ -351,12 +355,17 @@ void gameInit(Game* game_obj)
     //--Load Resources--//
     Engine_Render_addImage(game_obj->gEngine, "treasure", box, 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
-    Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240); //TODO: change image
-    Engine_Render_addImage(game_obj->gEngine, "win", block, 50, 50); //TODO: change image
-    Engine_Render_addImage(game_obj->gEngine, "lose", block, 50, 50); //TODO: change image
-    Engine_Render_addImage(game_obj->gEngine, "item", block, 50, 50); //TODO: change image
-    Engine_Render_addImage(game_obj->gEngine, "connectionText1", block, 50, 50); //TODO: change image
-    Engine_Render_addImage(game_obj->gEngine, "connectionText2", block, 50, 50); //TODO: change image
+    Engine_Render_addImage(game_obj->gEngine, "background", backgroundImage, 320, 240); //TODO: background image
+    Engine_Render_addImage(game_obj->gEngine, "title", block, 50, 50); //TODO: "{gameTitle}" text
+    Engine_Render_addImage(game_obj->gEngine, "win", block, 50, 50); //TODO: "YOU WIN" text
+    Engine_Render_addImage(game_obj->gEngine, "lose", block, 50, 50); //TODO: "YOU LOSE" text
+    Engine_Render_addImage(game_obj->gEngine, "item", block, 50, 50); //TODO: a symbol to show that one has got an item
+    Engine_Render_addImage(game_obj->gEngine, "connectionText1", block, 50, 50); //TODO: "Finding Opponent..." text
+    Engine_Render_addImage(game_obj->gEngine, "connectionText2", block, 50, 50); //TODO: "Someone challenges you!" text
+    Engine_Render_addImage(game_obj->gEngine, "pvc1", block, 50, 50); //TODO: PVC button (unpressed)
+    Engine_Render_addImage(game_obj->gEngine, "pvc2", block, 50, 50); //TODO: PVC button (pressed)
+    Engine_Render_addImage(game_obj->gEngine, "pvp1", block, 50, 50); //TODO: PVP button (unpressed)
+    Engine_Render_addImage(game_obj->gEngine, "pvp2", block, 50, 50); //TODO: PVP button (pressed)
     Engine_Render_addImage(game_obj->gEngine, "ground", block, 320, 15);
     Engine_Render_addImage(game_obj->gEngine, "bullet", bulletImage, 3, 3);
     Engine_Render_addImage(game_obj->gEngine, "preview1-1", characters[0][0][0], 50, 50);
@@ -400,6 +409,7 @@ void gameInit(Game* game_obj)
     game_obj->blocks[3] = Engine_Render_newObject(game_obj->gEngine, "block", 180, 115, 1);
     game_obj->blocks[4] = Engine_Render_newObject(game_obj->gEngine, "block", 120, 60, 1);
 
+    game_obj->title = Engine_Render_newObject(game_obj->gEngine, "title", 0, 0, 1);
     game_obj->connectionText[0] = Engine_Render_newObject(game_obj->gEngine, "connectionText1", 0, 0, 0); //TO-DO: Change Position
     game_obj->connectionText[1] = Engine_Render_newObject(game_obj->gEngine, "connectionText2", 0, 0, 0); //TO-DO: Change Position
     for(int i = 1; i < 6; i++)
@@ -416,6 +426,7 @@ void gameInit(Game* game_obj)
     //--Add object to the render list for the first time--//
     Engine_Render_addObject(game_obj->gEngine, game_obj->background);
     Engine_Render_addObject(game_obj->gEngine, game_obj->ground);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->title);
     Engine_Render_addObject(game_obj->gEngine, game_obj->connectionText[0]);
     Engine_Render_addObject(game_obj->gEngine, game_obj->connectionText[1]);
     //

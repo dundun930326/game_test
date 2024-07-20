@@ -87,6 +87,7 @@ typedef struct game
     int frames;
 
     RenderObject *background, *ground;
+    RenderObject *title;
     RenderObject *previews[5];
     RenderObject *blocks[5];
     RenderObject *HP[2][3];
