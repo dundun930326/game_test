@@ -30,7 +30,7 @@ void startGameAsHost()
         game.render(&game);
         
         sendSync();
-        while(1) {
+        while(receiveAvaliable() < 1) {
             bool response = ackSync();
             if (response) {
                 //printf("Client responded to sync\n");
@@ -45,7 +45,7 @@ void startGameAsHost()
 
 void hostStart()
 {
-    clearBuffer();
+    //clearBuffer();
     sendRequest();
     game.mode = PVP_MASTER;
 
@@ -60,7 +60,7 @@ void hostStart()
     }
 
     // game loop to select character
-    clearBuffer();
+    //clearBuffer();
     pickCharacter();
     printf("Host character choosed.\n");
 

@@ -17,7 +17,8 @@ void personMove(Person* obj, int16_t magX)
     {
         obj->oriX *= -1;
     }
-    obj->speedX = magX / 3072 + obj->hurtPenalty;
+    if(!obj->stick) obj->speedX = magX / 3072 + obj->hurtPenalty;
+    else obj->speedX = 0;
     //if(obj->speedX > 10) obj->speedX = 10;
     //else if(obj->speedX < -10) obj->speedX = -10;
 }
@@ -43,7 +44,7 @@ void personUpdate(Person* obj, Engine* engine, int frames){
     }
     else if(obj->mRenderObject->mPosY + (-1 * obj->speedY) <= 0)
     {
-        obj->posY = 150;
+        obj->posY = 0;
         obj->speedY = 0;
         obj->oriY = -1; //hit the ceiling
     }
@@ -134,10 +135,22 @@ void personUpdate(Person* obj, Engine* engine, int frames){
     if(obj->hurtPenalty > 0) obj->hurtPenalty--;
     else if(obj->hurtPenalty < 0) obj->hurtPenalty++;
 
-    if(obj->powerTime != 0) obj->powerTime--;
+    if(obj->itemTime != 0) obj->itemTime--;
     else
     {
         if(obj->state == 3) obj->state = 1;
+    }
+
+    if(obj->powerTime >= 1)
+    {
+        obj->powerTime--;
+        if(obj->powerTime == 0)
+        {
+            obj->power = false;
+            obj->mRenderObject->setVisible(obj->mRenderObject, 1);
+            obj->mItemObject->setVisible(obj->mRenderObject, 1);
+            if(obj->mWeapon != NULL) obj->mWeapon->mRenderObject->setVisible(obj->mRenderObject, 1);
+        }
     }
     
     //printf("now power duration to %d\n", obj->powerTime);
@@ -162,8 +175,18 @@ void personUpdateData(Person* obj, Engine* engine, ConnectionData* data)
     obj->weapon_type = data->player_weapon_type;
 }
 
-void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
-    if(obj->cd == 0){
+void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle, Game* game){
+    if(obj->cd == 0 || (obj->power && obj->person_type == 3)){
+        double bestAngle;
+        if(obj->index == 1)
+        {
+            bestAngle = atan2(game->player1->posY - game->player2->posY, game->player2->posX - game->player1->posX) * 180 / PI;
+        }
+        else
+        {
+            bestAngle = atan2(game->player2->posY - game->player1->posY, game->player1->posX - game->player2->posX) * 180 / PI;
+        }
+        //printf("bestAngle: %f\n", bestAngle);
         switch(obj->weapon_type)
         {
             case 1:// pistol
@@ -171,7 +194,7 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
                 {
                     if(bullets[i] == NULL)
                     {
-                        bullets[i] = newBullet(engine, obj, angle);
+                        bullets[i] = newBullet(engine, obj, (obj->power && obj->person_type == 1) ? bestAngle : angle);
                         Engine_Render_addObject(engine, bullets[i]->mRenderObject);
                         break;
                     }
@@ -185,7 +208,7 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
                 {
                     if(bullets[i] == NULL)
                     {
-                        bullets[i] = newBullet(engine, obj, angle);
+                        bullets[i] = newBullet(engine, obj, (obj->power && obj->person_type == 1) ? bestAngle : angle);
                         Engine_Render_addObject(engine, bullets[i]->mRenderObject);
                         break;
                     }
@@ -200,7 +223,7 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
                 {
                     if(bullets[i] == NULL)
                     {
-                        bullets[i] = newBullet(engine, obj, angle + 5 * (count - 1));
+                        bullets[i] = newBullet(engine, obj, (obj->power && obj->person_type == 1) ? (bestAngle + 5 * (count - 1)) : (angle + 5 * (count - 1)));
                         Engine_Render_addObject(engine, bullets[i]->mRenderObject);
                         count++;
                     }
@@ -217,7 +240,53 @@ void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle){
         return;
 }
 
-bool personDamage(Person* obj, Bullet* bullet)
+void personBigPower(Person* obj, Bullet* bullets[], Engine* engine, double angle)
+{
+    obj->power = true;
+    switch(obj->person_type)
+    {
+        case 0: //Sasge: Disappear
+            obj->mRenderObject->setVisible(obj->mRenderObject, 0);
+            Engine_Render_render(engine, obj->mRenderObject);
+            obj->mItemObject->setVisible(obj->mItemObject, 0);
+            Engine_Render_render(engine, obj->mItemObject);
+            if(obj->mWeapon != NULL)
+            {
+                obj->mWeapon->mRenderObject->setVisible(obj->mWeapon->mRenderObject, 0);
+                Engine_Render_render(engine, obj->mWeapon->mRenderObject);
+            }
+            obj->powerTime = 80;
+            break;
+
+        case 1: //Musk: Auto aim ???
+            obj->powerTime = 80;
+            break;
+
+        case 2: //English: 15 bullet at once
+            int count = 0;
+            for(int i = 0; i < 20; i++)
+            {
+                if(bullets[i] == NULL)
+                {
+                    bullets[i] = newBullet(engine, obj, 24 * count);
+                    Engine_Render_addObject(engine, bullets[i]->mRenderObject);
+                    count++;
+                }
+                if(count == 16) break;
+            }
+            break;
+
+        case 3: //Pie: No CD
+            obj->powerTime = 40;
+            break;
+
+        case 4: //Anya: Reverse bullet
+            obj->powerTime = 80;
+            break;
+    }
+}
+
+bool personDamage(Person* obj, Bullet* bullet, Bullet* bullets[], Engine* engine)
 {
     int cenX = bullet->posX + 1;
     int cenY = bullet->posY + 1;
@@ -225,33 +294,49 @@ bool personDamage(Person* obj, Bullet* bullet)
         && (obj->posY <= cenY && cenY <= obj->posY + 50)
         && obj->state == 1)
     {
-        obj->state = 2;
-        obj->hurtTime = HURTTIME_DURATION;
-        obj->hurtPenalty = 15 * cos(bullet->angle * PI / 180);
-        obj->speedY += 15 * sin(bullet->angle * PI / 180);
-        obj->dropWeapon(obj);
-        if((obj->posX + 20 <= cenX && cenX <= obj->posX + 30)
-            && (obj->posY + 5 <= cenY && cenY <= obj->posY + 15))
+        if(obj->power && obj->person_type == 4)
         {
-            obj->HP = (obj->HP >= 10) ? (obj->HP - 10) : 0;
-            return true;
-        }
-        else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
-            && (obj->posY <= cenY && cenY <= obj->posY + 20))
-        {
-            obj->HP = (obj->HP >= 5) ? (obj->HP - 5) : 0;
-            return true;
-        }
-        else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
-            && (obj->posY <= cenY && cenY <= obj->posY + 35))
-        {
-            obj->HP = (obj->HP >= 2) ? (obj->HP - 2) : 0;
+            for(int i = 0; i < 20; i++)
+            {
+                if(bullets[i] == NULL)
+                {
+                    bullets[i] = newBullet(engine, obj, bullet->angle + 180);
+                    Engine_Render_addObject(engine, bullets[i]->mRenderObject);
+                    break;
+                }
+            }
             return true;
         }
         else
         {
-            obj->HP = (obj->HP >= 1) ? (obj->HP - 1) : 0;
-            return true;
+            obj->state = 2;
+            obj->hurtTime = HURTTIME_DURATION;
+            obj->hurtPenalty = 15 * cos(bullet->angle * PI / 180);
+            obj->speedY += 15 * sin(bullet->angle * PI / 180);
+            obj->dropWeapon(obj);
+            if((obj->posX + 20 <= cenX && cenX <= obj->posX + 30)
+                && (obj->posY + 5 <= cenY && cenY <= obj->posY + 15))
+            {
+                obj->HP = (obj->HP >= 10) ? (obj->HP - 10) : 0;
+                return true;
+            }
+            else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
+                && (obj->posY <= cenY && cenY <= obj->posY + 20))
+            {
+                obj->HP = (obj->HP >= 5) ? (obj->HP - 5) : 0;
+                return true;
+            }
+            else if((obj->posX + 15 <= cenX && cenX <= obj->posX + 35)
+                && (obj->posY <= cenY && cenY <= obj->posY + 35))
+            {
+                obj->HP = (obj->HP >= 2) ? (obj->HP - 2) : 0;
+                return true;
+            }
+            else
+            {
+                obj->HP = (obj->HP >= 1) ? (obj->HP - 1) : 0;
+                return true;
+            }
         }
     }
     else return false;
@@ -297,17 +382,18 @@ void personUseItem(Person* obj)
     {
         obj->item = 0;
         obj->state = 3;
-        obj->powerTime = POWERTIME_DURATION;
+        obj->itemTime = ITEMTIME_DURATION;
         obj->mItemObject->setVisible(obj->mItemObject, 0);
     }
 }
 
-Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index)
+Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index, uint8_t type)
 {
     Person* obj = calloc(1, sizeof(Person));
     obj->move = personMove;
     obj->jump = personJump;
     obj->attack = personAttack;
+    obj->bigPower = personBigPower;
     obj->damage = personDamage;
     obj->update = personUpdate;
     obj->updateData = personUpdateData;
@@ -317,15 +403,19 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index)
     obj->obtainItem = personObtainItem;
     obj->useItem = personUseItem;
     obj->state = 1; //1->normal 2->damaged >=3->invincible (decaded by frames)
+    obj->stick = 0;
     obj->oriX = (index == 1 ? 1 : -1);
     obj->oriY = 1; //oriY=1 -> stand on the floor
     obj->hurtTime = 0;
     obj->hurtPenalty = 0;
+    obj->itemTime = 0;
     obj->powerTime = 0;
+    obj->power = false;
     obj->accel = 1;
     obj->HP = 100;
     obj->index = index;
     obj->weapon_type = 4;
+    obj->person_type = type;
     obj->cd = 0;// cd=0 -> person can attack
     obj->posX = posX;
     obj->posY = posY;

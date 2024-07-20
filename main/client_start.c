@@ -39,7 +39,7 @@ void startGameAsClient()
         game.readInput(&game);
         game.update(&game);
         game.render(&game);
-        while(1) {
+        while(receiveAvaliable() < 1) {
             bool response = ackSync();
             if (response) {
                 //printf("Host asked to sync\n");
@@ -58,7 +58,7 @@ void startGameAsClient()
 void clientStart()
 {
     // tells host you have accepted request
-    clearBuffer();
+    //clearBuffer();
     sendRequest();
     game.mode = PVP_SLAVE;
 
@@ -75,7 +75,6 @@ void clientStart()
             break;
         }
     }
-    clearBuffer();
     
     startGameAsClient();
     isPvP = false;

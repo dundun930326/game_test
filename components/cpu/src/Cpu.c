@@ -58,8 +58,13 @@ void cpuCompute(CPU* obj, Game* game)
 {
     if(game->gameState == 2)
     {
-        //state 1: go for treasure
-        if(game->mTreasure->available)
+        //state 1: use big power
+        if(game->player2_powerPer == 101)
+        {
+            if(game->frames % 5 == 0) obj->keyboardSim += add[BIGPOWER];
+        }
+        //state 2: go for treasure
+        else if(game->mTreasure->available)
         {
             //printf("CPU: now state: 1\n");
             if(game->player2->posY >= blockPosY[2])
@@ -90,7 +95,7 @@ void cpuCompute(CPU* obj, Game* game)
                 //printf("CPU: now goal is %d\n", obj->CurrentGoal);
             }
         }
-        //state 2: go for weapon
+        //state 3: go for weapon
         else if(cpuFindWeapon(obj, game))
         {
             //printf("CPU: now state: 2\n");
@@ -102,19 +107,19 @@ void cpuCompute(CPU* obj, Game* game)
                 cpuLookFor(obj, game);
             }
         }
-        //state 3: use item
+        //state 4: use item
         else if(game->player1->weapon_type != 4 && game->player2->item == 1)
         {
             //printf("CPU: now state: 3\n");
             if(game->frames % 5 == 2) obj->keyboardSim += add[ITEM];
         }
-        //state 4: attack
+        //state 5: attack
         else if(game->player2->weapon_type != 4)
         {
             //printf("CPU: now state: 4\n");
             if(game->frames % 5 == 3) obj->keyboardSim += add[ATTACK];
-            obj->JoystickXSim = game->player1->posX - game->player2->posX;
-            obj->JoystickYSim = game->player2->posY - game->player1->posY;
+            obj->JoystickXSim = game->player1->posX - game->player2->posX + (rand() % 50 - 25);
+            obj->JoystickYSim = game->player2->posY - game->player1->posY + (rand() % 50 - 25);
         }
     }
 }

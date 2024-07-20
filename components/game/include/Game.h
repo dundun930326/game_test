@@ -13,8 +13,8 @@
 #include "Cpu.h"
 
 enum keyFunc{
-    IDLE1 = 0,
-    IDLE2 = 1,
+    STICK = 0,
+    BIGPOWER = 1,
     PAUSE = 2,
     JUMP = 3,
     ATTACK = 4,
@@ -79,6 +79,9 @@ typedef struct game
     uint8_t player1_character_type;
     uint8_t player2_character_type;
 
+    uint8_t player1_powerPer;
+    uint8_t player2_powerPer;
+
     //0: pvc, 1: pvp (self-master), 2: pvp (self-slave)
     uint8_t mode;
     bool startPressed;
@@ -95,6 +98,7 @@ typedef struct game
     RenderObject *result;
     RenderObject *connectionText[2]; //0: "Inviting...", 1: "Receive an invitation"
     RenderObject *modeButtons[2];
+    RenderObject *powerBar[2];
 
     void (*init)(struct game*);
     void (*start)(struct game*);

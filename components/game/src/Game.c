@@ -13,6 +13,7 @@
 #include "numbers_bitmap.h"
 #include "box.h"
 #include "texts.h"
+#include "bar.h"
 #include "Engine.h"
 #include "uartFunction.h"
 
@@ -43,6 +44,7 @@ extern const uint16_t pvp1[];
 extern const uint16_t pvp2[];
 extern const uint16_t pvc1[];
 extern const uint16_t pvc2[];
+extern const uint16_t bar[];
 
 const uint16_t weapon_right[3][2500];
 const uint16_t weapon_left[3][2500];
@@ -54,7 +56,8 @@ const uint16_t (*characters[2][5])[2500] = {{Sasge_left, Musk_left, English_left
                                         {Sasge_right, Musk_right, English_right, Pie_right, Anya_right}};
 const char* person_allArray[2][2][6] = {{{"person1-1l", "person1-2l", "person1-3l", "person1-4l", "person1-5l", "person1-6l"}, {"person1-1r", "person1-2r", "person1-3r", "person1-4r", "person1-5r", "person1-6r"}},
 {{"person2-1l", "person2-2l", "person2-3l", "person2-4l", "person2-5l", "person2-6l"}, {"person2-1r", "person2-2r", "person2-3r", "person2-4r", "person2-5r", "person2-6r"}}};
-int8_t add[6] = {1, 3, 5, 9, 17, 33};
+const char* powerbar_allArray[11] = {"powerbar1", "powerbar2", "powerbar3", "powerbar4", "powerbar5", "powerbar6", "powerbar7", "powerbar8", "powerbar9", "powerbar10", "powerbar11"};
+int8_t add[6] = {1, 2, 4, 8, 16, 32};
 
 //--functions for internal usage only--//
 void gameLoadPerson(Game* game_obj)
@@ -125,11 +128,19 @@ void gameStart(Game* game_obj)
     game_obj->mTreasure = newTreasure(game_obj->gEngine);
     Engine_Render_addObject(game_obj->gEngine, game_obj->mTreasure->mRenderObject);
 
+    //create power bar object
+    game_obj->powerBar[0] = Engine_Render_newObject(game_obj->gEngine, "powerbar1", 15, 55, 1);
+    game_obj->powerBar[1] = Engine_Render_newObject(game_obj->gEngine, "powerbar1", 320 - 15 - 9, 55, 1);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->powerBar[0]);
+    Engine_Render_addObject(game_obj->gEngine, game_obj->powerBar[1]);
+    game_obj->player1_powerPer = 1;
+    game_obj->player2_powerPer = 1;
+
     //create person objects
     if(game_obj->mode == PVC || game_obj->mode == PVP_MASTER)
     {
-        game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1);
-        game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2);
+        game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1, game_obj->player1_character_type);
+        game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2, game_obj->player2_character_type);
         int temp = game_obj->player1->HP;
         for(int i = 0; i < 3; i++)
         {
@@ -147,8 +158,8 @@ void gameStart(Game* game_obj)
     }
     else if(game_obj->mode == PVP_SLAVE)
     {
-        game_obj->player1 = newPerson(game_obj->gEngine, 270, 190, 1);
-        game_obj->player2 = newPerson(game_obj->gEngine, 0, 190, 2);        
+        game_obj->player1 = newPerson(game_obj->gEngine, 270, 190, 1, game_obj->player1_character_type);
+        game_obj->player2 = newPerson(game_obj->gEngine, 0, 190, 2, game_obj->player2_character_type);        
         int temp = game_obj->player1->HP;
         for(int i = 0; i < 3; i++)
         {
@@ -164,6 +175,7 @@ void gameStart(Game* game_obj)
             temp /= 10;
         }
     }
+
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mRenderObject);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mItemObject);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
@@ -270,6 +282,11 @@ void gameReset(Game* game_obj)
 
     Engine_Render_removeObject(game_obj->gEngine, game_obj->result);
     Engine_Render_deleteObject(game_obj->gEngine, game_obj->result);
+
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->powerBar[0]);
+    Engine_Render_deleteObject(game_obj->gEngine, game_obj->powerBar[0]);
+    Engine_Render_removeObject(game_obj->gEngine, game_obj->powerBar[1]);
+    Engine_Render_deleteObject(game_obj->gEngine, game_obj->powerBar[1]);
 
     if(game_obj->mode == PVC)
     {
@@ -399,6 +416,8 @@ void gameNew(Game* game_obj)
     game_obj->frames = 0;
     game_obj->player1_character_type = 0;
     game_obj->player2_character_type = 0;
+    game_obj->player1_powerPer = 1;
+    game_obj->player2_powerPer = 1;
     game_obj->mode = PVC;
     game_obj->startPressed = false;
     game_obj->gEngine = newEngine();
@@ -444,6 +463,17 @@ void gameInit(Game* game_obj)
     Engine_Render_addImage(game_obj->gEngine, "weapon1-l", weapon_left[0], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "weapon2-l", weapon_left[1], 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "weapon3-l", weapon_left[2], 50, 50);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar1", block, 9, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar2", block, 18, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar3", block, 27, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar4", block, 36, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar5", block, 45, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar6", block, 54, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar7", block, 63, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar8", block, 72, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar9", block, 81, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar10", block, 90, 3);
+    Engine_Render_addImage(game_obj->gEngine, "powerbar11", bar, 90, 3);
 
     for(int i = 0; i < 10; i++)
     {
@@ -565,27 +595,39 @@ void gameReadInput(Game* game_obj)
             break;
 
         case GAMESTATE_MAINGAME:
-            if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b001000)
+            if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[JUMP])
             {
                 game_obj->player1->jump(game_obj->player1);
             }
-            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b010000)
+            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[ATTACK])
             {
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
                 if(Engine_Joystick_notZero(game_obj->gEngine))
                 {
-                    game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, Engine_Joystick_getAngle(game_obj->gEngine));
+                    game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, Engine_Joystick_getAngle(game_obj->gEngine), game_obj);
                 }
                 else
                 {
-                    game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, (game_obj->player1->oriX > 0) ? 0 : 180);
+                    game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, (game_obj->player1->oriX > 0) ? 0 : 180, game_obj);
                 }
             }
-            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b100000)
+            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[ITEM])
             {
                 game_obj->player1->useItem(game_obj->player1);
             }
-            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
+            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[BIGPOWER])
+            {
+                if(game_obj->player1_powerPer == 101)
+                {
+                    game_obj->player1_powerPer = 1;
+                    game_obj->player1->bigPower(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, Engine_Joystick_getAngle(game_obj->gEngine));
+                }
+            }
+            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[STICK])
+            {
+                game_obj->player1->stick = 1 - game_obj->player1->stick;
+            }
+            else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[PAUSE])
             {
                 if(game_obj->mode == PVC)
                 {
@@ -609,7 +651,15 @@ void gameReadInput(Game* game_obj)
                 }
                 else if(game_obj->mCPU->keyboardSim == add[ATTACK])
                 {
-                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mCPU->JoystickYSim, game_obj->mCPU->JoystickXSim) * 180 / PI);
+                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mCPU->JoystickYSim, game_obj->mCPU->JoystickXSim) * 180 / PI, game_obj);
+                }
+                else if(game_obj->mCPU->keyboardSim == add[BIGPOWER])
+                {
+                    if(game_obj->player2_powerPer == 101)
+                    {
+                        game_obj->player2_powerPer = 1;
+                        game_obj->player2->bigPower(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mCPU->JoystickYSim, game_obj->mCPU->JoystickXSim) * 180 / PI);
+                    }
                 }
                 game_obj->player2->move(game_obj->player2, game_obj->mCPU->JoystickXSim);
             }
@@ -626,7 +676,19 @@ void gameReadInput(Game* game_obj)
                 }
                 else if(game_obj->mDatas->input_keyboard == add[ATTACK])
                 {
-                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mDatas->input_joystickY, game_obj->mDatas->input_joystickX) * 180 / PI);
+                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mDatas->input_joystickY, game_obj->mDatas->input_joystickX) * 180 / PI, game_obj);
+                }
+                else if(game_obj->mDatas->input_keyboard == add[BIGPOWER])
+                {
+                    if(game_obj->player2_powerPer == 101)
+                    {
+                        game_obj->player2_powerPer = 1;
+                        game_obj->player2->bigPower(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mDatas->input_joystickY, game_obj->mDatas->input_joystickX) * 180 / PI);
+                    }
+                }
+                else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[STICK])
+                {
+                    game_obj->player2->stick = 1 - game_obj->player2->stick;
                 }
                 game_obj->player2->move(game_obj->player2, game_obj->mDatas->input_joystickX);
                 
@@ -703,7 +765,7 @@ void gameUpdate(Game* game_obj)
                         deleteBullet(game_obj->my_bullet[i], game_obj->gEngine);
                         game_obj->my_bullet[i] = NULL;
                     }
-                    else if(game_obj->player2->damage(game_obj->player2, game_obj->my_bullet[i]))
+                    else if(game_obj->player2->damage(game_obj->player2, game_obj->my_bullet[i], game_obj->enemy_bullet, game_obj->gEngine))
                     {
                         Engine_Render_removeObject(game_obj->gEngine, game_obj->my_bullet[i]->mRenderObject);
                         deleteBullet(game_obj->my_bullet[i], game_obj->gEngine);
@@ -723,7 +785,7 @@ void gameUpdate(Game* game_obj)
                         deleteBullet(game_obj->enemy_bullet[i], game_obj->gEngine);
                         game_obj->enemy_bullet[i] = NULL;
                     }
-                    else if(game_obj->player1->damage(game_obj->player1, game_obj->enemy_bullet[i]))
+                    else if(game_obj->player1->damage(game_obj->player1, game_obj->enemy_bullet[i], game_obj->my_bullet, game_obj->gEngine))
                     {
                         Engine_Render_removeObject(game_obj->gEngine, game_obj->enemy_bullet[i]->mRenderObject);
                         deleteBullet(game_obj->enemy_bullet[i], game_obj->gEngine);
@@ -777,7 +839,7 @@ void gameUpdate(Game* game_obj)
             //update person
             game_obj->player1->update(game_obj->player1, game_obj->gEngine, game_obj->frames);
             game_obj->player2->update(game_obj->player2, game_obj->gEngine, game_obj->frames);
-            printf("player2 posY: %d\n", game_obj->player2->posY);
+            //printf("player2 posY: %d\n", game_obj->player2->posY);
             Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
             if(game_obj->player1->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeapon->mRenderObject);
             Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
@@ -836,6 +898,30 @@ void gameUpdate(Game* game_obj)
             {
                 gameOver(game_obj, 1);
                 game_obj->gameState = 4;
+            }
+
+            //update powerbar
+            if(game_obj->frames % 2 == 0)
+            {
+                if(!game_obj->player1->power && game_obj->player1_powerPer != 101) game_obj->player1_powerPer++;
+                if(!game_obj->player2->power && game_obj->player2_powerPer != 101) game_obj->player2_powerPer++;
+            }
+            if(game_obj->player1_powerPer % 10 == 0 || game_obj->player1_powerPer == 1)
+            {
+                game_obj->powerBar[0]->setVisible(game_obj->powerBar[0], 0);
+                Engine_Render_render(game_obj->gEngine, game_obj->powerBar[0]);
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->powerBar[0], powerbar_allArray[game_obj->player1_powerPer / 10]);
+                game_obj->powerBar[0]->setVisible(game_obj->powerBar[0], 1);
+                Engine_Render_render(game_obj->gEngine, game_obj->powerBar[0]);
+            }
+            if(game_obj->player2_powerPer % 10 == 0 || game_obj->player2_powerPer == 1)
+            {
+                game_obj->powerBar[1]->setVisible(game_obj->powerBar[1], 0);
+                Engine_Render_render(game_obj->gEngine, game_obj->powerBar[1]);
+                Engine_Render_changeObjectImage(game_obj->gEngine, game_obj->powerBar[1], powerbar_allArray[game_obj->player2_powerPer / 10]);
+                game_obj->powerBar[1]->setPos(game_obj->powerBar[1], 320 - 15 - ((game_obj->player2_powerPer / 10 + 1) == 11 ? 10 : (game_obj->player2_powerPer / 10 + 1)) * 9, 55);
+                game_obj->powerBar[1]->setVisible(game_obj->powerBar[1], 1);
+                Engine_Render_render(game_obj->gEngine, game_obj->powerBar[1]);                
             }
             break;
     }

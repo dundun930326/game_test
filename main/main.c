@@ -67,13 +67,14 @@ void startPVCGame() {
 }
 
 void app_main(void) {
-    gameNew(&game);
-    game.init(&game);
-    printf("Game init success!!!\n");
-
     uartSetup();
     setTimeoutMs(100);
     clearBuffer();
+    vTaskDelay(5000/portTICK_PERIOD_MS);
+
+    gameNew(&game);
+    game.init(&game);
+    printf("Game init success!!!\n");
     
     while(!isPvP)
     {
@@ -92,15 +93,18 @@ void app_main(void) {
     {
         // look for requests, if found request, start game as client. If not, check if start button is pressed
         // if start button is pressed, start the game as host
-        bool foundRequest = acceptRequest();
-        if (foundRequest) {
-            if(playerWantsToStart) {
-                printf("hello I am client!\n");
-                clientStart();
-            } 
-        } else if(startButtonPressed) {
-                printf("hello I am host!\n");
-                hostStart();
+        if(receiveAvaliable() > 0)
+        {
+            bool foundRequest = acceptRequest();
+            if (foundRequest) {
+                if(playerWantsToStart) {
+                    printf("hello I am client!\n");
+                    clientStart();
+                } 
+            } else if(startButtonPressed) {
+                    printf("hello I am host!\n");
+                    hostStart();
+            }
         }
     }
 }
