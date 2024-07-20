@@ -43,7 +43,7 @@ void personUpdate(Person* obj, Engine* engine, int frames){
     }
     else if(obj->mRenderObject->mPosY + (-1 * obj->speedY) <= 0)
     {
-        obj->posY = 0;
+        obj->posY = 150;
         obj->speedY = 0;
         obj->oriY = -1; //hit the ceiling
     }
@@ -156,6 +156,7 @@ void personUpdateData(Person* obj, Engine* engine, ConnectionData* data)
     obj->oriY = data->player_oriY;
     obj->posX = data->player_posX;
     obj->posY = data->player_posY;
+    //obj->posY = 190;
     obj->speedX = data->player_speedX;
     obj->speedY = data->player_speedY;
     obj->weapon_type = data->player_weapon_type;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -13,41 +14,53 @@
 #include "Game.h"
 
 extern Game game;
-
-double timer_val_1 = 0;
-double timer_val_2 = 0;
+extern bool isPvP;
 
 void startGameAsHost()
 {
     printf("starting game as host...\n");
+    sendUint8(game.player1_character_type);
     gameStart(&game);
-    while(!game.startPressed)
+
+    //timerSetup(3);
+    while(game.gameState != 4 || !game.startPressed)
     {
         game.readInput(&game);
         game.update(&game);
         game.render(&game);
-        vTaskDelay((2000/60)/portTICK_PERIOD_MS);
+        
+        sendSync();
+        while(1) {
+            bool response = ackSync();
+            if (response) {
+                //printf("Client responded to sync\n");
+                break;
+            }
+        } 
+        gameSendData(&game);
+        gameGetData(&game);
     }
     game.startPressed = false;
 }
 
 void hostStart()
 {
-    //clearBuffer();
+    clearBuffer();
     sendRequest();
     game.mode = PVP_MASTER;
 
     // wait for client to accept request
     while(1) {
+        printf("Waiting...\n");
         bool response = acceptRequest();
         if (response) {
             printf("Client responded to request\n");
             break;
         }
     }
-    //clearBuffer();
 
     // game loop to select character
+    clearBuffer();
     pickCharacter();
     printf("Host character choosed.\n");
 
@@ -63,4 +76,5 @@ void hostStart()
 
     sendInit();
     startGameAsHost();
+    isPvP = false;
 }

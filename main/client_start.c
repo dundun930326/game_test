@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -12,6 +13,7 @@
 #include "Game.h"
 
 extern Game game;
+extern bool isPvP;
 
 void pickCharacter()
 {
@@ -30,13 +32,24 @@ void pickCharacter()
 void startGameAsClient()
 {
     printf("Starting game as client...\n");
+    sendUint8(game.player1_character_type);
     gameStart(&game);
-    while(!game.startPressed)
+    while(game.gameState != 4 || !game.startPressed)
     {
         game.readInput(&game);
         game.update(&game);
         game.render(&game);
-        vTaskDelay((2000/60)/portTICK_PERIOD_MS);
+        while(1) {
+            bool response = ackSync();
+            if (response) {
+                //printf("Host asked to sync\n");
+                break;
+            }
+        }
+        sendSync();  
+        gameSendData(&game);
+        gameGetData(&game); 
+        //vTaskDelay((2000/60)/portTICK_PERIOD_MS);
     }
     game.startPressed = false;
 }
@@ -45,15 +58,15 @@ void startGameAsClient()
 void clientStart()
 {
     // tells host you have accepted request
+    clearBuffer();
     sendRequest();
     game.mode = PVP_SLAVE;
-    //clearBuffer();
-    // game loop to pick character
+
+    // game loop to select character
     pickCharacter();
     printf("Client character choosed.\n");
     // tell host you are ready
     sendRequest();
-    //clearBuffer();
 
     while(1) {
         bool response = ackInit();
@@ -65,4 +78,5 @@ void clientStart()
     clearBuffer();
     
     startGameAsClient();
+    isPvP = false;
 }

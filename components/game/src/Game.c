@@ -103,10 +103,13 @@ void gameStart(Game* game_obj)
     game_obj->gameState = GAMESTATE_MAINGAME;
     printf("Game starting...\n");
     game_obj->frames = 0;
-    game_obj->mPackages->game_character_type = game_obj->player1_character_type;
-    gameSendData(game_obj);
-    gameGetData(game_obj);
-    game_obj->player2_character_type = game_obj->mDatas->game_character_type;
+    //game_obj->mPackages->game_character_type = game_obj->player1_character_type;
+    //gameSendData(game_obj);
+    //gameGetData(game_obj);
+    //game_obj->player2_character_type = game_obj->mDatas->game_character_type;
+    game_obj->player2_character_type = receiveUint8();
+    printf("Receive type: %d\n", game_obj->player2_character_type);
+    clearBuffer();
 
     for(int i = 0; i < 5; i++)
     {
@@ -278,6 +281,7 @@ void gameReset(Game* game_obj)
         game_obj->mDatas = NULL;
     }
 
+    game_obj->startPressed = false;
     Engine_Render_addObject(game_obj->gEngine, game_obj->title);
     Engine_Render_addObject(game_obj->gEngine, game_obj->modeButtons[0]);
     Engine_Render_addObject(game_obj->gEngine, game_obj->modeButtons[1]);
@@ -292,44 +296,47 @@ void gameDataInit(Game* game_obj)
     {
         game_obj->mDatas = calloc(1, sizeof(ConnectionData));
         game_obj->mDatas->game_character_type = 0;
-        game_obj->mDatas->player_HP = 0;
-        game_obj->mDatas->player_state = 0;
-        game_obj->mDatas->player_oriX = 0;
-        game_obj->mDatas->player_oriY = 0;
+        game_obj->mDatas->player_HP = 100;
+        game_obj->mDatas->player_state = 1;
+        game_obj->mDatas->player_oriX = 1;
+        game_obj->mDatas->player_oriY = 1;
         game_obj->mDatas->player_posX = 0;
         game_obj->mDatas->player_posY = 0;
         game_obj->mDatas->player_speedX = 0;
         game_obj->mDatas->player_speedY = 0;
-        game_obj->mDatas->player_weapon_type = 0;
+        game_obj->mDatas->player_weapon_type = 4;
         game_obj->mDatas->input_keyboard = 0;
+        game_obj->mDatas->input_joystickX = 0;
+        game_obj->mDatas->input_joystickY = 0;
     }
     if(game_obj->mPackages == NULL)
     {
         game_obj->mPackages = calloc(1, sizeof(ConnectionData));
         game_obj->mPackages->game_character_type = 0;
-        game_obj->mPackages->player_HP = 0;
-        game_obj->mPackages->player_state = 0;
-        game_obj->mPackages->player_oriX = 0;
-        game_obj->mPackages->player_oriY = 0;
+        game_obj->mPackages->player_HP = 100;
+        game_obj->mPackages->player_state = 1;
+        game_obj->mPackages->player_oriX = 1;
+        game_obj->mPackages->player_oriY = 1;
         game_obj->mPackages->player_posX = 0;
         game_obj->mPackages->player_posY = 0;
         game_obj->mPackages->player_speedX = 0;
         game_obj->mPackages->player_speedY = 0;
-        game_obj->mPackages->player_weapon_type = 0;
+        game_obj->mPackages->player_weapon_type = 4;
         game_obj->mPackages->input_keyboard = 0;
+        game_obj->mPackages->input_joystickX = 0;
+        game_obj->mPackages->input_joystickY = 0;
     }
 }
 
-CPU* temp; //delete this line after pvp mechanic design is done.
 void gameGetData(Game* game_obj)
 {
     game_obj->mDatas->game_character_type = receiveUint8();
     game_obj->mDatas->player_HP = receiveUint8();
     game_obj->mDatas->player_state = receiveUint8();
     game_obj->mDatas->player_oriX = receiveUint8();
-    game_obj->mDatas->player_oriY += receiveUint8() * 256;
+    game_obj->mDatas->player_oriY = receiveUint8() * 256;
     game_obj->mDatas->player_oriY += receiveUint8();
-    game_obj->mDatas->player_posX += receiveUint8() * 256;
+    game_obj->mDatas->player_posX = receiveUint8() * 256;
     game_obj->mDatas->player_posX += receiveUint8();
     game_obj->mDatas->player_posY = receiveUint8() * 256;
     game_obj->mDatas->player_posY += receiveUint8();
@@ -343,6 +350,7 @@ void gameGetData(Game* game_obj)
     game_obj->mDatas->input_joystickX += receiveUint8();
     game_obj->mDatas->input_joystickY = receiveUint8() * 256;
     game_obj->mDatas->input_joystickY += receiveUint8();
+    /*
     printf("game_character_type: %d\n", game_obj->mDatas->game_character_type);
     printf("player_HP: %d\n", game_obj->mDatas->player_HP);
     printf("player_state: %d\n", game_obj->mDatas->player_state);
@@ -356,26 +364,8 @@ void gameGetData(Game* game_obj)
     printf("input_keyboard: %d\n", game_obj->mDatas->input_keyboard);
     printf("input_joystickX: %d\n", game_obj->mDatas->input_joystickX);
     printf("input_joystickY: %d\n", game_obj->mDatas->input_joystickY);
-    clearBuffer();
-    
-    //--delete these line after pvp mechanic design is done.--//
-    /*
-    temp->compute(temp, game_obj);
-    game_obj->mDatas->input_joystickX = temp->JoystickXSim;
-    game_obj->mDatas->input_joystickY = temp->JoystickYSim;
-    game_obj->mDatas->input_keyboard = temp->keyboardSim;
-
-    game_obj->mDatas->player_HP = game_obj->player2->HP;
-    game_obj->mDatas->player_state = game_obj->player2->state;
-    game_obj->mDatas->player_oriX = game_obj->player2->oriX;
-    game_obj->mDatas->player_oriY = game_obj->player2->oriY;
-    game_obj->mDatas->player_posX = game_obj->player2->posX;
-    game_obj->mDatas->player_posY = game_obj->player2->posY;
-    game_obj->mDatas->player_speedX = game_obj->player2->speedX;
-    game_obj->mDatas->player_speedY = game_obj->player2->speedY;
-    game_obj->mDatas->player_weapon_type = game_obj->player2->weapon_type;
     */
-    //----//
+    clearBuffer();
 }
 
 void gameSendData(Game* game_obj)
@@ -422,7 +412,6 @@ void gameNew(Game* game_obj)
 
 void gameInit(Game* game_obj)
 {
-    temp = newCPU(); //delete this line after pvp mechanic design is done.
     //--Load Resources--//
     Engine_Render_addImage(game_obj->gEngine, "treasure", box, 50, 50);
     Engine_Render_addImage(game_obj->gEngine, "block", block, 80, 15);
@@ -626,7 +615,6 @@ void gameReadInput(Game* game_obj)
             }
             else if(game_obj->mode == PVP_MASTER || game_obj->mode == PVP_SLAVE)
             {
-                gameGetData(game_obj);
                 game_obj->player2->updateData(game_obj->player2, game_obj->gEngine, game_obj->mDatas, game_obj->frames);
                 if(game_obj->mDatas->input_keyboard == add[JUMP])
                 {
@@ -660,6 +648,7 @@ void gameReadInput(Game* game_obj)
         case GAMESTATE_GAMEOVER:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
+                game_obj->startPressed = true;
                 Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 gameReset(game_obj);
             }
@@ -788,6 +777,7 @@ void gameUpdate(Game* game_obj)
             //update person
             game_obj->player1->update(game_obj->player1, game_obj->gEngine, game_obj->frames);
             game_obj->player2->update(game_obj->player2, game_obj->gEngine, game_obj->frames);
+            printf("player2 posY: %d\n", game_obj->player2->posY);
             Engine_Render_render(game_obj->gEngine, game_obj->player1->mRenderObject);
             if(game_obj->player1->mWeapon != NULL) Engine_Render_render(game_obj->gEngine, game_obj->player1->mWeapon->mRenderObject);
             Engine_Render_render(game_obj->gEngine, game_obj->player2->mRenderObject);
@@ -823,6 +813,7 @@ void gameUpdate(Game* game_obj)
             }
             else if(game_obj->mode == PVP_MASTER || game_obj->mode == PVP_SLAVE)
             {
+                game_obj->mPackages->game_character_type = game_obj->player1_character_type;
                 game_obj->mPackages->player_HP = game_obj->player1->HP;
                 game_obj->mPackages->player_state = game_obj->player1->state;
                 game_obj->mPackages->player_oriX = game_obj->player1->oriX;

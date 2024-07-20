@@ -18,6 +18,12 @@ bool startButtonPressed = true;
 // check if client wants to accept PVP request
 bool playerWantsToStart = true;
 
+//double timer_val_1 = 0;
+//double timer_val_2 = 0;
+double my_timer_val_3 = 0;
+double other_timer_val_3 = 0;
+double delay = 0;
+
 // there are 4 timers in esp32, parameter is 0-3 for each timer, timerSetup starts the timer, getTime assigns the time in seconds to timer_val
 // ex:
 // timerSetup(0);
@@ -89,11 +95,11 @@ void app_main(void) {
         bool foundRequest = acceptRequest();
         if (foundRequest) {
             if(playerWantsToStart) {
-                printf("hello i am client!\n");
+                printf("hello I am client!\n");
                 clientStart();
             } 
         } else if(startButtonPressed) {
-                printf("hello i am host!\n");
+                printf("hello I am host!\n");
                 hostStart();
         }
     }
