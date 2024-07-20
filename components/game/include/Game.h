@@ -81,6 +81,7 @@ typedef struct game
 
     //0: pvc, 1: pvp (self-master), 2: pvp (self-slave)
     uint8_t mode;
+    bool startPressed;
 
     //0: title screen, 1: select screen, 2: maingame screen, 3: pause screen, 4: gameover screen
     uint8_t gameState;
@@ -93,6 +94,7 @@ typedef struct game
     RenderObject *HP[2][3];
     RenderObject *result;
     RenderObject *connectionText[2]; //0: "Inviting...", 1: "Receive an invitation"
+    RenderObject *modeButtons[2];
 
     void (*init)(struct game*);
     void (*start)(struct game*);
@@ -114,6 +116,7 @@ void gameReset(Game* game_obj);
 //--Connection related functions--//
 void gameDataInit(Game* game_obj);
 void gameGetData(Game* game_obj);
+void gameSendData(Game* game_obj);
 //----//
 
 void gameNew(Game* game_obj);

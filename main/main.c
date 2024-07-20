@@ -1,129 +1,100 @@
 #include <stdio.h>
-#include <stdint.h>
-#include <math.h>
-
+#include <inttypes.h>
+#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_spiffs.h"
-#include "esp_heap_caps.h"
-
+#include "esp_chip_info.h"
+#include "esp_system.h"
+#include "host_start.c"
 #include "Game.h"
-
-
-
-// #include "../files/people.h"
-
 
 //--important variable--//
 Game game;
 //----//
 
-//--Declare Managers and objects--//
-// extern const uint16_t people[];
-// extern const uint16_t people2[];
+bool isPvP = false;
+// check if player has pressed start
+bool startButtonPressed = true;
+// check if client wants to accept PVP request
+bool playerWantsToStart = true;
 
-//----//
+// there are 4 timers in esp32, parameter is 0-3 for each timer, timerSetup starts the timer, getTime assigns the time in seconds to timer_val
+// ex:
+// timerSetup(0);
+// double timer_val;
+// getTime(0, &timer_val);
+// printf("Time: %f\n", timer_val);
 
-void app_main(void)
-{   
+timer_config_t config = {
+    .divider = 16,  // Clock divider
+    .counter_dir = TIMER_COUNT_UP,  // Counting direction
+    .counter_en = TIMER_PAUSE,      // Timer state
+    .alarm_en = TIMER_ALARM_EN,     // Enable alarm
+    .auto_reload = true,            // Auto-reload on alarm
+};
+
+
+void timerSetup(int x)
+{
+    int i = x / 2;
+    int j = x % 2;
+    timer_init(i, j, &config);
+    timer_set_counter_value(i, j, 0);
+    timer_start(i, j);
+    printf("Timer%d started\n", x);
+}
+
+
+void getTime(int x, double *timer_val)
+{
+    int i = x / 2;
+    int j = x % 2;
+    timer_get_counter_time_sec(i, j, timer_val);
+}
+
+void startPVCGame() {
+    //printf("Starting game in PVC mode...\n");
+    game.readInput(&game);
+    game.update(&game);
+    game.render(&game);
+    vTaskDelay((2000/60)/portTICK_PERIOD_MS);
+}
+
+void app_main(void) {
     gameNew(&game);
     game.init(&game);
     printf("Game init success!!!\n");
-    //game.start(&game);
 
-    while(1){
-        game.readInput(&game);
-        //printf("Game readInput success!!!\n");
-        game.update(&game);
-        //printf("Game update success!!!\n");
-        game.render(&game);
-        //printf("Game render success!!!\n");
-        //vTaskDelay(2000/portTICK_PERIOD_MS);
-        vTaskDelay((2000/60)/portTICK_PERIOD_MS);
-    }
-
-    // for(int i = 0; i < 1; i++)
-    // {
-    //     newPerson(&group[i], gEngine, 1, 190);
-    //     Engine_Render_addObject(gEngine, group[i].mRenderObject);
-    // }
-    // for(int i = 0; i < 2; i++)
-    // {
-    //     Engine_Render_changeObjectImage(gEngine, group[i].mRenderObject, "person2");
-    // }
-
-    // int16_t frame_count = 0;
-
-    //while(0){
-        // Engine_Detect(gEngine);
-        // Engine_Audio_handleAudioEvents(gEngine);
-
-        // group[0].move(&(group[0]));
-        // Engine_Render_render(gEngine, group[0].mRenderObject);
-        // if(frame_count%4==1){
-        //     Engine_Render_changeObjectImage(gEngine, group[0].mRenderObject, "person2");
-        //     Engine_Render_render(gEngine, group[0].mRenderObject);
-        // }
-        // if(frame_count%4==3){
-        //     Engine_Render_changeObjectImage(gEngine, group[0].mRenderObject, "person1");
-        //     Engine_Render_render(gEngine, group[0].mRenderObject);
-        // }
-
-        // Engine_Render_update(gEngine);
-        // vTaskDelay((2000/60)/portTICK_PERIOD_MS);
-        // frame_count ++;
-    //}
-
+    uartSetup();
+    setTimeoutMs(100);
+    clearBuffer();
     
-    // while(1)
-    // {
-    //     Engine_Detect(gEngine);
-    //     Engine_Audio_handleAudioEvents(gEngine);
-
-    //     if(Engine_Keyboard_isKeyPress(gEngine, 0b000001))
-    //     {
-    //         Engine_Audio_play(gEngine, "/spiffs/gunshot.mp3");
-    //     }
-    //     else if(Engine_Keyboard_isKeyPress(gEngine, 0b000010))
-    //     {
-    //         Engine_Audio_play(gEngine, "/spiffs/adf_music.mp3");
-    //     }
-    //     else if(Engine_Keyboard_isKeyPress(gEngine, 0b000100))
-    //     {
-    //         Engine_Audio_play(gEngine, "/spiffs/metalpipe.mp3");
-    //     }
-    //     else if(Engine_Keyboard_isKeyPress(gEngine, 0b001000))
-    //     {
-    //         Engine_Audio_play(gEngine, "/spiffs/potai.mp3");
-    //     }
-    //     else if(Engine_Keyboard_isKeyPress(gEngine, 0b010000))
-    //     {
-    //         Engine_Audio_play(gEngine, "/spiffs/yamete.mp3");
-    //     }
-    //     else if(Engine_Keyboard_isKeyPress(gEngine, 0b100000))
-    //     {
-    //         Engine_Audio_play(gEngine, "/spiffs/guncock.mp3");
-    //     }
-
-        
-    //     for(int i = 0; i < 5; i++)
-    //     {
-    //         group[i].move(&(group[i]));
-    //     }
-    //     for(int i = 0; i < 5; i++)
-    //     {
-    //         Engine_Render_render(gEngine, group[i].mRenderObject);
-    //     }
-    //     Engine_Render_update(gEngine);
-    //     vTaskDelay((1000/60)/portTICK_PERIOD_MS);
-    // }
-
-    /*
-    for(int i = 0; i < 5; i++)
+    while(!isPvP)
     {
-        deletePerson(&group[i], gEngine);
+        if((game.mode == PVP_MASTER || game.mode == PVP_SLAVE) && game.startPressed == true)
+        {
+            isPvP = true;
+            game.startPressed = false;
+        }
+        else
+        {
+            startPVCGame();
+        }
     }
-    */
-    //printf("%s\n", "Code finished.");
-    //return 0;
+
+    while (true)
+    {
+        // look for requests, if found request, start game as client. If not, check if start button is pressed
+        // if start button is pressed, start the game as host
+        bool foundRequest = acceptRequest();
+        if (foundRequest) {
+            if(playerWantsToStart) {
+                printf("hello i am client!\n");
+                clientStart();
+            } 
+        } else if(startButtonPressed) {
+                printf("hello i am host!\n");
+                hostStart();
+        }
+    }
 }
