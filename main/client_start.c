@@ -14,6 +14,11 @@
 
 extern Game game;
 extern bool isPvP;
+extern bool backToTitle;
+extern double startTime;
+extern double timer_val_1;
+extern void timerSetup(int);
+extern void getTime(int, double*);
 
 void pickCharacter()
 {
@@ -34,7 +39,7 @@ void startGameAsClient()
     printf("Starting game as client...\n");
     sendUint8(game.player1_character_type);
     gameStart(&game);
-    while(game.gameState != 4 || !game.startPressed)
+    while(1)
     {
         game.readInput(&game);
         game.update(&game);
@@ -50,6 +55,15 @@ void startGameAsClient()
         gameSendData(&game);
         gameGetData(&game); 
         //vTaskDelay((2000/60)/portTICK_PERIOD_MS);
+        if(game.gameState == 4) break;
+    }
+    game.startPressed = false;
+    while(1)
+    {
+        game.readInput(&game);
+        game.update(&game);
+        game.render(&game);
+        if(game.gameState == 0) break;
     }
     game.startPressed = false;
 }
@@ -57,25 +71,38 @@ void startGameAsClient()
 // run this when client accepts request
 void clientStart()
 {
-    // tells host you have accepted request
-    //clearBuffer();
-    sendRequest();
-    game.mode = PVP_SLAVE;
-
     // game loop to select character
+    //clearBuffer();
     pickCharacter();
     printf("Client character choosed.\n");
-    // tell host you are ready
-    sendRequest();
+    
+    sendRequest(); //Request 3: tell host you are ready
 
-    while(1) {
+    timerSetup(1);
+    getTime(1, &timer_val_1);
+    startTime = timer_val_1;
+    while(1) { //Ack init before game starts.
         bool response = ackInit();
         if (response) {
             printf("Client has prepare to start game!\n");
             break;
         }
+        getTime(1, &timer_val_1);
+        if(timer_val_1 - startTime >= 10)
+        {
+            isPvP = false;
+            backToTitle = true;
+            printf("Opponent didn't respond!\n");
+            break;
+        }
     }
-    
-    startGameAsClient();
+    if(!backToTitle)
+    {
+        startGameAsClient();
+    }
+    else
+    {
+        gameReset(&game);
+    }
     isPvP = false;
 }

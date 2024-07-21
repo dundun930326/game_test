@@ -47,6 +47,7 @@ void personUpdate(Person* obj, Engine* engine, int frames){
         obj->posY = 0;
         obj->speedY = 0;
         obj->oriY = -1; //hit the ceiling
+        //printf("hit ceiling!!!\n");
     }
     else if (obj->speedY<=0 && obj->mRenderObject->mPosY + 50 >= 170 && obj->mRenderObject->mPosY + 50 <= 170+15){
         
@@ -147,9 +148,12 @@ void personUpdate(Person* obj, Engine* engine, int frames){
         if(obj->powerTime == 0)
         {
             obj->power = false;
-            obj->mRenderObject->setVisible(obj->mRenderObject, 1);
-            obj->mItemObject->setVisible(obj->mRenderObject, 1);
-            if(obj->mWeapon != NULL) obj->mWeapon->mRenderObject->setVisible(obj->mRenderObject, 1);
+            if(obj->index == 2)
+            {
+                obj->mRenderObject->setVisible(obj->mRenderObject, 1);
+                obj->mItemObject->setVisible(obj->mRenderObject, 1);
+                if(obj->mWeapon != NULL) obj->mWeapon->mRenderObject->setVisible(obj->mRenderObject, 1);
+            }
         }
     }
     
@@ -163,16 +167,20 @@ void personUpdate(Person* obj, Engine* engine, int frames){
 
 void personUpdateData(Person* obj, Engine* engine, ConnectionData* data)
 {
+    
     obj->HP = data->player_HP;
-    obj->state = data->player_state;
+    //obj->HP = abs(obj->HP - data->player_HP) <= 10 ? data->player_HP : obj->HP;
+    obj->state = (1 <= data->player_state && data->player_state <= 3) ? data->player_state : obj->state;
     obj->oriX = data->player_oriX;
     obj->oriY = data->player_oriY;
     obj->posX = data->player_posX;
     obj->posY = data->player_posY;
-    //obj->posY = 190;
+    //obj->posX = abs(obj->posX - data->player_posX) <= 20 ? data->player_posX : obj->posX;
+    //obj->posY = abs(obj->posY - data->player_posY) <= 20 ? data->player_posY : obj->posY;
     obj->speedX = data->player_speedX;
     obj->speedY = data->player_speedY;
     obj->weapon_type = data->player_weapon_type;
+    //printf("update P2's information!!\n");
 }
 
 void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle, Game* game){
@@ -246,14 +254,17 @@ void personBigPower(Person* obj, Bullet* bullets[], Engine* engine, double angle
     switch(obj->person_type)
     {
         case 0: //Sasge: Disappear
-            obj->mRenderObject->setVisible(obj->mRenderObject, 0);
-            Engine_Render_render(engine, obj->mRenderObject);
-            obj->mItemObject->setVisible(obj->mItemObject, 0);
-            Engine_Render_render(engine, obj->mItemObject);
-            if(obj->mWeapon != NULL)
+            if(obj->index == 2)
             {
-                obj->mWeapon->mRenderObject->setVisible(obj->mWeapon->mRenderObject, 0);
-                Engine_Render_render(engine, obj->mWeapon->mRenderObject);
+                obj->mRenderObject->setVisible(obj->mRenderObject, 0);
+                Engine_Render_render(engine, obj->mRenderObject);
+                obj->mItemObject->setVisible(obj->mItemObject, 0);
+                Engine_Render_render(engine, obj->mItemObject);
+                if(obj->mWeapon != NULL)
+                {
+                    obj->mWeapon->mRenderObject->setVisible(obj->mWeapon->mRenderObject, 0);
+                    Engine_Render_render(engine, obj->mWeapon->mRenderObject);
+                }
             }
             obj->powerTime = 80;
             break;

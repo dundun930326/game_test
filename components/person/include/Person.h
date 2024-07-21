@@ -54,7 +54,7 @@ typedef struct person
     void (*move)(struct person*, int16_t);
     void (*jump)(struct person*);
     void (*update)(struct person*, Engine*, int); //to update the state of a person.(cd--)
-    void (*updateData)(struct person*, Engine*, ConnectionData*, int);
+    void (*updateData)(struct person*, Engine*, ConnectionData*);
     void (*attack)(struct person*, Bullet*[], Engine*, double, Game*);
     void (*bigPower)(struct person*, Bullet*[], Engine*, double);
     bool (*damage)(struct person*, Bullet*, Bullet*[], Engine*);
@@ -69,7 +69,7 @@ typedef struct person
 //void personMove(Person* obj, int speed_x, bool jump, bool downstair);//speed_x -> x data of joystick
 void personMove(Person* obj, int16_t magX);//speed_x -> x data of joystick
 void personUpdate(Person* obj, Engine* engine, int frames);
-void personUpdateByData(Person* obj, Engine* engine, ConnectionData* data, int frames);
+void personUpdateData(Person* obj, Engine* engine, ConnectionData* data);
 void personAttack(Person* obj, Bullet* bullets[], Engine* engine, double angle, Game* game);
 void personBigPower(Person* obj, Bullet* bullets[], Engine* engine, double angle);
 bool personDamage(Person* obj, Bullet* bullet, Bullet* bullets[], Engine* engine);

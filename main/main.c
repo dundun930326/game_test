@@ -18,11 +18,15 @@ bool startButtonPressed = true;
 // check if client wants to accept PVP request
 bool playerWantsToStart = true;
 
-//double timer_val_1 = 0;
-//double timer_val_2 = 0;
+bool backToTitle = false;
+
+double timer_val_0 = 0;
+double timer_val_1 = 0;
+double timer_val_2 = 0;
 double my_timer_val_3 = 0;
 double other_timer_val_3 = 0;
 double delay = 0;
+double startTime = 0;
 
 // there are 4 timers in esp32, parameter is 0-3 for each timer, timerSetup starts the timer, getTime assigns the time in seconds to timer_val
 // ex:
@@ -76,34 +80,67 @@ void app_main(void) {
     game.init(&game);
     printf("Game init success!!!\n");
     
-    while(!isPvP)
+    while(1)
     {
-        if((game.mode == PVP_MASTER || game.mode == PVP_SLAVE) && game.startPressed == true)
+        printf("Game loop start!!!\n");
+        clearBuffer();
+        while(!isPvP)
         {
-            isPvP = true;
-            game.startPressed = false;
+            if((game.mode == PVP_MASTER || game.mode == PVP_SLAVE) && game.startPressed == true)
+            {
+                isPvP = true;
+                game.startPressed = false;
+                backToTitle = false;
+            }
+            else
+            {
+                startPVCGame();
+            }
         }
-        else
-        {
-            startPVCGame();
-        }
-    }
 
-    while (true)
-    {
-        // look for requests, if found request, start game as client. If not, check if start button is pressed
-        // if start button is pressed, start the game as host
-        if(receiveAvaliable() > 0)
+        timerSetup(0);
+        getTime(0, &timer_val_0);
+        startTime = timer_val_0;
+
+        while (true)
         {
-            bool foundRequest = acceptRequest();
-            if (foundRequest) {
-                if(playerWantsToStart) {
+            // look for requests, if found request, start game as client. If not, check if start button is pressed
+            // if start button is pressed, start the game as host
+            //bool foundRequest = acceptRequest();
+            if (receiveAvaliable()) {
+                bool foundRequest = acceptRequest();
+                if(foundRequest) { //Respond of Request 1.
                     printf("hello I am client!\n");
+                    sendRequest(); //Request 2: tells host you have accepted request.
+                    game.mode = PVP_SLAVE;
                     clientStart();
                 } 
-            } else if(startButtonPressed) {
-                    printf("hello I am host!\n");
-                    hostStart();
+            } else {
+                printf("hello I am host!\n");
+                sendRequest(); //Request 1: find opponent.
+                game.mode = PVP_MASTER;
+                // wait for client to accept request
+                while(1) {
+                    bool response = acceptRequest();
+                    if (response) { //Respond of Request 2.
+                        printf("Client responded to request\n");
+                        break;
+                    }
+                    getTime(0, &timer_val_0);
+                    if(timer_val_0 - startTime >= 10) //Escape if there's no respond.
+                    {
+                        isPvP = false;
+                        backToTitle = true;
+                        printf("can't not find a opponent!\n");
+                        break;
+                    }
+                }
+                if(backToTitle)
+                {
+                    gameReset(&game);
+                    break;
+                }
+                else hostStart();
             }
         }
     }

@@ -15,6 +15,10 @@
 
 extern Game game;
 extern bool isPvP;
+extern double startTime;
+extern double timer_val_1;
+extern void timerSetup(int);
+extern void getTime(int, double*);
 
 void startGameAsHost()
 {
@@ -23,7 +27,7 @@ void startGameAsHost()
     gameStart(&game);
 
     //timerSetup(3);
-    while(game.gameState != 4 || !game.startPressed)
+    while(1)
     {
         game.readInput(&game);
         game.update(&game);
@@ -39,42 +43,54 @@ void startGameAsHost()
         } 
         gameSendData(&game);
         gameGetData(&game);
+        if(game.gameState == 4) break;
+    }
+    game.startPressed = false;
+    while(1)
+    {
+        game.readInput(&game);
+        game.update(&game);
+        game.render(&game);
+        if(game.gameState == 0) break;
     }
     game.startPressed = false;
 }
 
 void hostStart()
 {
-    //clearBuffer();
-    sendRequest();
-    game.mode = PVP_MASTER;
-
-    // wait for client to accept request
-    while(1) {
-        printf("Waiting...\n");
-        bool response = acceptRequest();
-        if (response) {
-            printf("Client responded to request\n");
-            break;
-        }
-    }
-
     // game loop to select character
     //clearBuffer();
     pickCharacter();
     printf("Host character choosed.\n");
 
-    // wait for client to select character
-    while(1)   {
+    timerSetup(1);
+    getTime(1, &timer_val_1);
+    startTime = timer_val_1;
+    
+    while(1){ //Respond of Request 3.
         bool response = acceptRequest();
         if (response) {
             printf("Client has chosen his character\n");
             break;
         }
+        getTime(1, &timer_val_1);
+        if(timer_val_1 - startTime >= 10)
+        {
+            isPvP = false;
+            backToTitle = true;
+            printf("Opponent didn't respond!\n");
+            break;
+        }
+    }
+    if(!backToTitle)
+    {
+        sendInit(); //Send init before game starts.
+        startGameAsHost();
+    }
+    else
+    {
+        gameReset(&game);
     }
     //clearBuffer();
-
-    sendInit();
-    startGameAsHost();
     isPvP = false;
 }

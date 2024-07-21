@@ -42,7 +42,7 @@ typedef struct bullet Bullet;
 
 typedef struct connectionData
 {
-    uint8_t game_character_type;
+    uint8_t game_treasure_seed;
     uint8_t player_HP;
     uint8_t player_state;
     int8_t player_oriX;
@@ -89,10 +89,12 @@ typedef struct game
     //0: title screen, 1: select screen, 2: maingame screen, 3: pause screen, 4: gameover screen
     uint8_t gameState;
     int frames;
+    bool isWin;
 
     RenderObject *background, *ground;
     RenderObject *title;
     RenderObject *previews[5];
+    RenderObject *previewBack;
     RenderObject *blocks[5];
     RenderObject *HP[2][3];
     RenderObject *result;
