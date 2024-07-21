@@ -38,6 +38,7 @@ typedef struct person
     uint8_t powerTime;
     bool power;
     bool stick;
+    bool HPchange;
     int8_t oriX;
     int16_t oriY;
     int16_t posX;

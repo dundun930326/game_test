@@ -168,7 +168,11 @@ void personUpdate(Person* obj, Engine* engine, int frames){
 void personUpdateData(Person* obj, Engine* engine, ConnectionData* data)
 {
     
-    obj->HP = data->player_HP;
+    if(obj->HP != data->player_HP)
+    {
+        obj->HP = data->player_HP;
+        obj->HPchange = true;
+    }
     //obj->HP = abs(obj->HP - data->player_HP) <= 10 ? data->player_HP : obj->HP;
     obj->state = (1 <= data->player_state && data->player_state <= 3) ? data->player_state : obj->state;
     obj->oriX = data->player_oriX;
@@ -320,6 +324,7 @@ bool personDamage(Person* obj, Bullet* bullet, Bullet* bullets[], Engine* engine
         }
         else
         {
+            obj->HPchange = true;
             obj->state = 2;
             obj->hurtTime = HURTTIME_DURATION;
             obj->hurtPenalty = 15 * cos(bullet->angle * PI / 180);
@@ -422,6 +427,7 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index, uin
     obj->itemTime = 0;
     obj->powerTime = 0;
     obj->power = false;
+    obj->HPchange = false;
     obj->accel = 1;
     obj->HP = 100;
     obj->index = index;

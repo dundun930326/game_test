@@ -206,7 +206,7 @@ void gameAddNewWeaponBySeed(Game* game_obj)
 {
     if(game_obj->mode == PVP_SLAVE && game_obj->mDatas->game_treasure_seed != 0)
     {
-        printf("Slave added weapon with seed: %d\n", game_obj->mDatas->game_treasure_seed);
+        //printf("Slave added weapon with seed: %d\n", game_obj->mDatas->game_treasure_seed);
         int type = (game_obj->mDatas->game_treasure_seed - 1) % 3 + 1;
         int loc = (game_obj->mDatas->game_treasure_seed - 1) % 4;
         for(int i = 0; i < 6; i++)
@@ -240,7 +240,7 @@ void gameAddNewWeapon(Game* game_obj)
         if(game_obj->mode == PVP_MASTER) 
         {
             game_obj->mPackages->game_treasure_seed = (game_obj->frames % 12 + 1);
-            printf("Host set seed to: %d\n", game_obj->mPackages->game_treasure_seed);
+            //printf("Host set seed to: %d\n", game_obj->mPackages->game_treasure_seed);
         }
     }
 }
@@ -497,6 +497,7 @@ void gameDataInit(Game* game_obj)
     if(game_obj->mDatas == NULL)
     {
         game_obj->mDatas = calloc(1, sizeof(ConnectionData));
+        game_obj->mDatas->test_index = 1;
         game_obj->mDatas->game_treasure_seed = 0;
         game_obj->mDatas->player_HP = 100;
         game_obj->mDatas->player_state = 1;
@@ -510,10 +511,12 @@ void gameDataInit(Game* game_obj)
         game_obj->mDatas->input_keyboard = 0;
         game_obj->mDatas->input_joystickX = 0;
         game_obj->mDatas->input_joystickY = 0;
+        game_obj->mDatas->input_joystickNotZero = 0;
     }
     if(game_obj->mPackages == NULL)
     {
         game_obj->mPackages = calloc(1, sizeof(ConnectionData));
+        game_obj->mPackages->test_index = 1;
         game_obj->mPackages->game_treasure_seed = 0;
         game_obj->mPackages->player_HP = 100;
         game_obj->mPackages->player_state = 1;
@@ -527,11 +530,13 @@ void gameDataInit(Game* game_obj)
         game_obj->mPackages->input_keyboard = 0;
         game_obj->mPackages->input_joystickX = 0;
         game_obj->mPackages->input_joystickY = 0;
+        game_obj->mPackages->input_joystickNotZero = 0;
     }
 }
 
 void gameGetData(Game* game_obj)
 {
+    game_obj->mDatas->test_index = receiveUint8();
     game_obj->mDatas->game_treasure_seed = receiveUint8();
     game_obj->mDatas->player_HP = receiveUint8();
     game_obj->mDatas->player_state = receiveUint8();
@@ -552,9 +557,9 @@ void gameGetData(Game* game_obj)
     game_obj->mDatas->input_joystickX += receiveUint8();
     game_obj->mDatas->input_joystickY = receiveUint8() * 256;
     game_obj->mDatas->input_joystickY += receiveUint8();
+    game_obj->mDatas->input_joystickNotZero = receiveUint8();    
     
-    
-    if(game_obj->mDatas->game_treasure_seed != 0) printf("get game_treasure_seed: %d\n", game_obj->mDatas->game_treasure_seed);
+    //if(game_obj->mDatas->game_treasure_seed != 0) printf("get game_treasure_seed: %d\n", game_obj->mDatas->game_treasure_seed);
     /*
     printf("player_HP: %d\n", game_obj->mDatas->player_HP);
     printf("player_state: %d\n", game_obj->mDatas->player_state);
@@ -575,7 +580,8 @@ void gameGetData(Game* game_obj)
 
 void gameSendData(Game* game_obj)
 {
-    if(game_obj->mPackages->game_treasure_seed != 0) printf("send game_treasure_seed: %d\n", game_obj->mPackages->game_treasure_seed);
+    //if(game_obj->mPackages->game_treasure_seed != 0) printf("send game_treasure_seed: %d\n", game_obj->mPackages->game_treasure_seed);
+    sendUint8(1);
     sendUint8(game_obj->mPackages->game_treasure_seed);
     sendUint8(game_obj->mPackages->player_HP);
     sendUint8(game_obj->mPackages->player_state);
@@ -596,6 +602,7 @@ void gameSendData(Game* game_obj)
     sendUint8((uint8_t)(game_obj->mPackages->input_joystickX));
     sendUint8((uint8_t)(game_obj->mPackages->input_joystickY >> 8));
     sendUint8((uint8_t)(game_obj->mPackages->input_joystickY));
+    sendUint8(game_obj->mPackages->input_joystickNotZero);
 
     game_obj->mPackages->game_treasure_seed = 0;
 }
@@ -873,7 +880,14 @@ void gameReadInput(Game* game_obj)
                 }
                 else if(game_obj->mDatas->input_keyboard == add[ATTACK])
                 {
-                    game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mDatas->input_joystickY, game_obj->mDatas->input_joystickX) * 180 / PI, game_obj);
+                    if(game_obj->mDatas->input_joystickNotZero)
+                    {
+                        game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, atan2(game_obj->mDatas->input_joystickY, game_obj->mDatas->input_joystickX) * 180 / PI, game_obj);
+                    }
+                    else
+                    {
+                        game_obj->player2->attack(game_obj->player2, game_obj->enemy_bullet, game_obj->gEngine, (game_obj->player2->oriX > 0) ? 0 : 180, game_obj);
+                    }
                 }
                 else if(game_obj->mDatas->input_keyboard == add[BIGPOWER])
                 {
@@ -893,6 +907,7 @@ void gameReadInput(Game* game_obj)
                 game_obj->mPackages->input_keyboard = Engine_Keyboard_getKeyPress(game_obj->gEngine);
                 game_obj->mPackages->input_joystickX = Engine_Joystick_getX(game_obj->gEngine);
                 game_obj->mPackages->input_joystickY = Engine_Joystick_getY(game_obj->gEngine);
+                game_obj->mPackages->input_joystickNotZero = Engine_Joystick_notZero(game_obj->gEngine);
             }
             break;
 
@@ -1052,8 +1067,9 @@ void gameUpdate(Game* game_obj)
 
             //update HP text
             //printf("now P1: %d, P2: %d\n", game_obj->player1->HP, game_obj->player2->HP);
-            if(game_obj->player1->hurtTime >= HURTTIME_DURATION - 1)
+            if(game_obj->player1->HPchange)
             {
+                game_obj->player1->HPchange = false;
                 int temp = game_obj->player1->HP;
                 for(int i = 0; i < 3; i++)
                 {
@@ -1062,8 +1078,9 @@ void gameUpdate(Game* game_obj)
                     temp /= 10;
                 }
             }
-            if(game_obj->player2->hurtTime >= HURTTIME_DURATION - 1)
+            if(game_obj->player2->HPchange)
             {
+                game_obj->player2->HPchange = false;
                 int temp = game_obj->player2->HP;
                 for(int i = 0; i < 3; i++)
                 {

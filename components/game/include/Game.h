@@ -42,6 +42,7 @@ typedef struct bullet Bullet;
 
 typedef struct connectionData
 {
+    uint8_t test_index;
     uint8_t game_treasure_seed;
     uint8_t player_HP;
     uint8_t player_state;
@@ -56,6 +57,7 @@ typedef struct connectionData
     int8_t input_keyboard;
     int16_t input_joystickX;
     int16_t input_joystickY;
+    uint8_t input_joystickNotZero;
 }ConnectionData;
 
 typedef struct game
