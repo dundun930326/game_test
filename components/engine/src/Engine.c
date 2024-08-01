@@ -175,9 +175,9 @@ void Engine_Audio_addAudio(Engine *engine, char name[])
 
 void Engine_Audio_play(Engine *engine, char name[])
 {
-    //Engine_Audio_handleAudioEvents(engine);
-    //audioPlayerStop(engine->AudioPlayer);
-    //audioPlayerPlay(engine->AudioPlayer, Engine_Audio_findAudioResourceByName(engine, name));
+    Engine_Audio_handleAudioEvents(engine);
+    audioPlayerStop(engine->AudioPlayer);
+    audioPlayerPlay(engine->AudioPlayer, Engine_Audio_findAudioResourceByName(engine, name));
 }
 
 void Engine_Audio_stop(Engine *engine)

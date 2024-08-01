@@ -17,6 +17,7 @@
 #include "items.h"
 #include "Engine.h"
 #include "uartFunction.h"
+#include "speaker.h"
 
 #define PI 3.14159265
 
@@ -150,10 +151,12 @@ void gameStart(Game* game_obj)
     game_obj->player2_powerPer = 1;
 
     //create person objects
+    
     if(game_obj->mode == PVC || game_obj->mode == PVP_MASTER)
     {
         game_obj->player1 = newPerson(game_obj->gEngine, 0, 190, 1, game_obj->player1_character_type);
         game_obj->player2 = newPerson(game_obj->gEngine, 270, 190, 2, game_obj->player2_character_type);
+        
         int temp = game_obj->player1->HP;
         for(int i = 0; i < 3; i++)
         {
@@ -193,6 +196,10 @@ void gameStart(Game* game_obj)
     Engine_Render_addObject(game_obj->gEngine, game_obj->player1->mItemObject);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mRenderObject);
     Engine_Render_addObject(game_obj->gEngine, game_obj->player2->mItemObject);
+
+    printf("try to play audio\n");
+    Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/sample_music.mp3");
+    Engine_Audio_play(game_obj->gEngine, "/spiffs/sample_music.mp3");
 
     printf("Game start!\n");
 
@@ -687,7 +694,7 @@ void gameInit(Game* game_obj)
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/guncock.mp3");
     Engine_Audio_addAudio(game_obj->gEngine, "/spiffs/bipbop.mp3");
 
-    Engine_Audio_setVolume(game_obj->gEngine, 0);
+    Engine_Audio_setVolume(game_obj->gEngine, -20);
     Engine_Joystick_setThreshold(game_obj->gEngine, 255);
     
     game_obj->background = Engine_Render_newObject(game_obj->gEngine, "background", 0, 0, 1);
@@ -735,12 +742,12 @@ void gameReadInput(Game* game_obj)
         case GAMESTATE_TITLE:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000001)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->mode = PVC;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000010)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->mode = PVP_MASTER;
             }  
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
@@ -754,39 +761,39 @@ void gameReadInput(Game* game_obj)
                 {
                     Engine_Render_addObject(game_obj->gEngine, game_obj->connectionText[0]);
                 }
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
             }
             break;          
         
         case GAMESTATE_SELECT:
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000001)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->player1_character_type = 0;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000010)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->player1_character_type = 1;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b001000)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->player1_character_type = 2;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b010000)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->player1_character_type = 3;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b100000)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 game_obj->player1_character_type = 4;
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
                 game_obj->startPressed = true;
                 if(game_obj->mode == PVC)
                 {
@@ -802,7 +809,7 @@ void gameReadInput(Game* game_obj)
             }
             else if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == add[ATTACK])
             {
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/gunshot.mp3");
                 if(Engine_Joystick_notZero(game_obj->gEngine))
                 {
                     game_obj->player1->attack(game_obj->player1, game_obj->my_bullet, game_obj->gEngine, Engine_Joystick_getAngle(game_obj->gEngine), game_obj);
@@ -833,7 +840,7 @@ void gameReadInput(Game* game_obj)
                 if(game_obj->mode == PVC)
                 {
                     game_obj->gameState = 3;
-                    Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
+                    //Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
                 }
             }
             game_obj->player1->move(game_obj->player1, Engine_Joystick_getX(game_obj->gEngine));
@@ -915,7 +922,7 @@ void gameReadInput(Game* game_obj)
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
                 game_obj->gameState = 2;
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/bipbop.mp3");
             }
             break;
         
@@ -923,7 +930,7 @@ void gameReadInput(Game* game_obj)
             if(Engine_Keyboard_getKeyPress(game_obj->gEngine) == 0b000100)
             {
                 game_obj->startPressed = true;
-                Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
+                //Engine_Audio_play(game_obj->gEngine, "/spiffs/guncock.mp3");
                 if(game_obj->isWin && game_obj->mode == PVC)
                 {
                     gameContinue(game_obj);

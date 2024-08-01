@@ -378,12 +378,12 @@ void personReleaseWeapon(Person* obj)
 //change weapon due to damaged
 void personDropWeapon(Person* obj)
 {
-    if(obj->mWeapon != NULL)
-    {
-        obj->mWeapon->drop(obj->mWeapon);
-        obj->mWeapon = NULL;
-        obj->weapon_type = 4;
-    }
+    // if(obj->mWeapon != NULL)
+    // {
+    //     obj->mWeapon->drop(obj->mWeapon);
+    //     obj->mWeapon = NULL;
+    //     obj->weapon_type = 4;
+    // }
 }
 
 void personObtainItem(Person* obj)
@@ -431,6 +431,7 @@ Person* newPerson(Engine* engine, int16_t posX, int16_t posY, uint8_t index, uin
     obj->accel = 1;
     obj->HP = 100;
     obj->index = index;
+    //weapon type
     obj->weapon_type = 4;
     obj->person_type = type;
     obj->cd = 0;// cd=0 -> person can attack
